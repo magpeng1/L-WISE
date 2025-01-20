@@ -1,1 +1,15 @@
+*.png
+*.o
 *:Zone.Identifier
+*.h5
+*.code-workspace
+.ipynb_checkpoints
+
+/__pycache__/
+.idea/
+imgproc_code/venvs/
+imgproc_code/data/
+imgproc_code/model_ckpts/
+imgproc_code/train_output/
+imgproc_code/o2_results/
+imgproc_code/lw_results/
