@@ -27,7 +27,7 @@ def get_args(argv):
     parser.add_argument('--dirmap_path', type=str, required=True, help="Path to dirmap csv.")
     parser.add_argument('--dataset_name', type=str, default=None, help="Name of dataset as defined in Robustness library")
     parser.add_argument('--dataset_path', type=str, default="/media/KLAB37/datasets/ImageNet2012", help="Path to dataset")
-    parser.add_argument('--model_ckpt_path', type=str, default="/home/morgan/projects/learn-histopath-backend/model_ckpts/imagenet_l2_3_0.pt", help="Path to model checkpoint")
+    parser.add_argument('--model_ckpt_path', type=str, default="model_ckpts/imagenet_l2_3_0.pt", help="Path to model checkpoint")
     parser.add_argument('--superclass', type=str, default=None, help="Use superclass. restrictedimagenet | imagenet16")
     parser.add_argument('--num_workers', type=int, default=1, help="Number of CPU threads for dataloader")
     parser.add_argument('--gpu_id', type=int, default=0, help="ID of GPU to use")

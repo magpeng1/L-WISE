@@ -1,5 +1,5 @@
 """Enhance an entire dataset of images using a neural model. 
-Run from root project folder using "python scripts/enhance.py ..."
+Run from imgproc_code folder using "python scripts/enhance.py ..."
 """
 
 import os
@@ -36,37 +36,33 @@ def get_args(argv):
 
     parser.add_argument('--dest_dir', type=str, required=True, help="Location at which dest dir will be created")
     parser.add_argument('--dirmap_path', type=str, default=None, help="Path to dirmap csv.")
-    parser.add_argument('--save_originals', default=False, action='store_true', help="Save original images")
-
-    parser.add_argument('--dataset_name', type=str, default=None, required=False, help="Name of dataset as defined in Robustness library (see robustness/datasets.py). Or, one of the superclass subset names (i.e. imagenet16). Can leave unspecified if using superclasses.")
     parser.add_argument('--dataset_path', type=str, default="/media/KLAB37/datasets/ImageNet2012", help="Path to dataset")
-
-    parser.add_argument('--arch', type=str, default='resnet50', help="Name of CNN archhitecture (e.g. resnet50, convnext_tiny, densenet201)")
+    parser.add_argument('--dataset_name', type=str, default=None, required=False, help="Name of dataset as defined in Robustness library (see robustness/datasets.py). Or, one of the superclass subset names (i.e. imagenet16). Can leave unspecified if using superclasses.")
     parser.add_argument('--model_ckpt_path', type=str, default="/home/morgan/projects/learn-histopath-backend/model_ckpts/imagenet_l2_3_0.pt", help="Path to model checkpoint")
-
+    parser.add_argument('--arch', type=str, default='resnet50', help="Name of CNN archhitecture (e.g. resnet50, convnext_tiny, densenet201)")
+    
+    # Setting up the optimization
     parser.add_argument('--eps', default=10, type=float, help="Epsilon budget for perturbation")
     parser.add_argument('--step_size', default=0.5, type=float, help="Perturbation step size")
     parser.add_argument('--num_steps', default=20, type=int, help="Number of steps for perturbation")
-
-    parser.add_argument('--objective_type', type=str, default="cross_entropy", help="Type of objective for enhancement. cross_entropy | logit | logit_diverge")
-    parser.add_argument('--diverge_from', nargs='+', help="Classes to diverge from. E.g., --diverge_from class1 class2 class3")
-
+    parser.add_argument('--objective_type', type=str, default="logit", help="Type of objective for enhancement. cross_entropy | logit | logit_diverge")
+    parser.add_argument('--diverge_from', nargs='+', help="Specific classes to diverge from, if using --objective_type logit_diverge. E.g., --diverge_from class1 class2 class3. All non-groundtruth classes are diverged from by default")
+    parser.add_argument('--superclass', type=str, default=None, help="Optimize toward superclass label instead of fine-grained class label. restrictedimagenet | imagenet16")
     parser.add_argument('--attack', default=False, action='store_true', help="Do an attack instead of enhancement")
 
-    parser.add_argument('--superclass', type=str, default=None, help="Use superclass. restrictedimagenet | imagenet16")
+    parser.add_argument('--save_originals', default=False, action='store_true', help="Save original images")
 
     parser.add_argument('--num_workers', type=int, default=1, help="Number of CPU threads for dataloader")
     parser.add_argument('--gpu_id', type=int, default=0, help="ID of GPU to use")
     parser.add_argument('--batch_size', type=int, default=32, help="Batch size")
 
+    # Create GIFs of the enhancement (experimental)
     parser.add_argument('--make_gifs', default=False, action='store_true', help="Make a GIF of each enhancement")
     parser.add_argument('--gif_forward_backward_loop', default=False, action='store_true', help="GIFs move in backwards and forwards directions. ")
     parser.add_argument('--gif_border', default=False, action='store_true', help="Make a color-changing border for the gif.")
     parser.add_argument('--gif_extremes', default=False, action='store_true', help="Store only the extremes of the image. If using this flag, best to set --gif_fps 1")
     parser.add_argument('--gif_fps', type=int, default=15, help="Frames per second for gif generation")
-
-    parser.add_argument('--make_diff_ims', default=False, action='store_true', help="Make a difference image between natural vs modulated")
-
+    
     if argv is None:
       args = argparse.Namespace()  # Create a namespace with default values
       
@@ -262,15 +258,6 @@ def enhance_images(**kwargs):
         else:
           orig_save_path = os.path.join(orig_dest_dir, f'image_{i}_{j}_aaa_orig.png')
         save_image(orig_img, orig_save_path)
-
-      if kwargs['make_diff_ims']:
-        im_diff = im_adv.detach().cpu()[j, :, :, :] - im.detach().cpu()[j, :, :, :]
-
-        im_diff = (im_diff - im_diff.min()) / (im_diff.max() - im_diff.min())
-        
-        base_save_path, ext = os.path.splitext(save_path)
-        im_diff_save_path = base_save_path + "_DIFF" + ext
-        save_image(im_diff, im_diff_save_path)
 
       if kwargs['make_gifs']:
           

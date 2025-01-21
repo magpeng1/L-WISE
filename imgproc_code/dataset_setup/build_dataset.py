@@ -27,7 +27,7 @@ def get_args(argv):
     parser.add_argument('--image_format', type=str, default=None, help="target img format (e.g. png, jpg")
 
     parser.add_argument('--obfuscate', default=False, action='store_true',
-                        help="Use random directory and file names so user can't guess class by page source inspect.")
+                        help="Use random directory and file names so user can't guess class by page source inspect. **This does NOT work currently, and is probably overkill")
     parser.add_argument('--distribute', default=False, action='store_true',
                         help="Within each class dir, make subdirs to avoid too many images in one dir (inefficient)")
     parser.add_argument('--max_ims_per_dir', type=int, default=1000, help="For obfuscate & distribute")
