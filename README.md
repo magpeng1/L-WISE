@@ -53,6 +53,30 @@ python test_model_on_dirmap_get_gt_logit.py --dirmap_path data/idaea4/idaea4_nat
 Note that "--class_num_col orig_class_num" is specified for ImageNet so that we evaluate the ground truth logits on the original 1000 classes, not the superclasses (i.e., how confident is the model that a specific image is "Siberian Husky" rather than "dog" in general)
 
 
+## How to train/fine-tune robust models
+
+This project builds directly on top of the [Robustness library](https://github.com/MadryLab/robustness) by the Madry Lab - if you simply wish to experiment with adversarially trained models, you may be better off using that library directly. Our code provides additional functionality for fine-tuning pretrained models through adversarial training.
+
+You can fine-tune an existing model using adversarial training via the script **imgproc_code/scripts/robust_transfer_learning.py**. Please review the arguments list of this script to understand how to use it. Note that, before training/fine-tuning a model on a new, oustide dataset, you must format the dataset appropriately (see [Dataset organization](#dataset-organization-and-how-to-add-new-datasets-to-this-project) section).
+
+For example, here is how to adversarially-fine-tune an adversarially-ImageNet-pretrained model on the MHIST histology dataset (with an adversarial epsilon of 1 during fine-tuning):
+```
+python scripts/robust_transfer_learning.py --dataset_name MHIST --dataset_path path/to/imagefolder/formatted/mhist --n_epochs 50 --lr 0.001 --custom_lr_multiplier "" --batch_size 16 --eps 1 --saved_model_ckpt_path model_ckpts/ImageNet_eps3.pt
+```
+
+You can also adversarially train models from scratch using this same script. For example, here is how to replicate our adversarially training run of a ResNet50 model on the iNaturalist dataset from scratch (run from inside imgproc_code directory):
+```
+# In one shot (may take a few weeks)
+python scripts/robust_transfer_learning.py --eps 1 --attack_steps 7 --attack_lr 0.3 --n_epochs 200 --lr 0.1 --step_lr 50 --step_lr_gamma 0.1 --gpu_ids 0 --custom_lr_multiplier "" --batch_size 256 --val_batch_size 128 --n_workers 16 --dataset_name inat --dataset_path path/to/inat2021
+
+# In two subsequent jobs (For the second job, change "85ad31ec-6919-52878a26a9f8" to the output directory of the first job)
+python scripts/robust_transfer_learning.py --eps 1 --attack_steps 7 --attack_lr 0.3 --n_epochs 100 --lr 0.1 --step_lr 50 --step_lr_gamma 0.1 --gpu_ids 0 --custom_lr_multiplier "" --batch_size 256 --val_batch_size 128 --n_workers 16 --dataset_name inat --dataset_path path/to/inat2021
+
+python scripts/robust_transfer_learning.py --eps 1 --attack_steps 7 --attack_lr 0.3 --n_epochs 100 --lr 0.001 --step_lr 50 --step_lr_gamma 0.1 --gpu_ids 0 --custom_lr_multiplier "" --batch_size 256 --val_batch_size 128 --n_workers 16 --dataset_name inat --dataset_path path/to/inat2021 --continue_same_dataset --saved_model_ckpt_path train_output/85ad31ec-6919-52878a26a9f8/checkpoint.pt.latest
+```
+In this example, we train with an adversarial epsilon of 1 (7 attack steps with step size 0.3), for 200 epochs, with a starting learning rate of 0.1, and multiplying the learning rate by a factor of 0.1 (--step_lr_gamma) every 50 epochs (--step_lr). 
+
+
 ## Dataset organization, and how to add new datasets to this project
 
 In order to add new image classification datasets to this project, there are three requirements: 
@@ -85,29 +109,6 @@ In order to train/evaluate models on image datasets within the [Robustness libra
 
 To train robust models on new, outside datasets, you must define a new class in imgproc_code/robustness/robustness/datasets.py. You can also add hyperparameter defaults in imgproc_code/robustness/robustness/defaults.py, and custom data augmentations in imgproc_code/robustness/robustness/data_augmentation.py. See also the original [Robustness library documentation](https://robustness.readthedocs.io/en/latest/example_usage/training_lib_part_2.html#training-on-custom-datasets) (this project includes a modified copy of the library)
 
-
-## How to train/fine-tune robust models
-
-This project builds directly on top of the [Robustness library](https://github.com/MadryLab/robustness) by the Madry Lab - if you simply wish to experiment with adversarially trained models, you may be better off using that library directly. Our code provides additional functionality for fine-tuning pretrained models through adversarial training.
-
-You can fine-tune an existing model using adversarial training via the script **imgproc_code/scripts/robust_transfer_learning.py**. Please review the arguments list of this script to understand how to use it. Note that, before training/fine-tuning a model on a new, oustide dataset, you must format the dataset appropriately (see [Dataset organization, and how to add new datasets to this project](#dataset-organization-and-how-to-add-new-datasets-to-this-project)).
-
-For example, here is how to adversarially-fine-tune an adversarially-ImageNet-pretrained model on the MHIST histology dataset (with an adversarial epsilon of 1 during fine-tuning):
-```
-python scripts/robust_transfer_learning.py --dataset_name MHIST --dataset_path path/to/imagefolder/formatted/mhist --n_epochs 50 --lr 0.001 --custom_lr_multiplier "" --batch_size 16 --eps 1 --saved_model_ckpt_path model_ckpts/ImageNet_eps3.pt
-```
-
-You can also adversarially train models from scratch using this same script. For example, here is how to replicate our adversarially training run of a ResNet50 model on the iNaturalist dataset from scratch (run from inside imgproc_code directory):
-```
-# In one shot (may take a few weeks)
-python scripts/robust_transfer_learning.py --eps 1 --attack_steps 7 --attack_lr 0.3 --n_epochs 200 --lr 0.1 --step_lr 50 --step_lr_gamma 0.1 --gpu_ids 0 --custom_lr_multiplier "" --batch_size 256 --val_batch_size 128 --n_workers 16 --dataset_name inat --dataset_path path/to/inat2021
-
-# In two subsequent jobs (For the second job, change "85ad31ec-6919-52878a26a9f8" to the output directory of the first job)
-python scripts/robust_transfer_learning.py --eps 1 --attack_steps 7 --attack_lr 0.3 --n_epochs 100 --lr 0.1 --step_lr 50 --step_lr_gamma 0.1 --gpu_ids 0 --custom_lr_multiplier "" --batch_size 256 --val_batch_size 128 --n_workers 16 --dataset_name inat --dataset_path path/to/inat2021
-
-python scripts/robust_transfer_learning.py --eps 1 --attack_steps 7 --attack_lr 0.3 --n_epochs 100 --lr 0.001 --step_lr 50 --step_lr_gamma 0.1 --gpu_ids 0 --custom_lr_multiplier "" --batch_size 256 --val_batch_size 128 --n_workers 16 --dataset_name inat --dataset_path path/to/inat2021 --continue_same_dataset --saved_model_ckpt_path train_output/85ad31ec-6919-52878a26a9f8/checkpoint.pt.latest
-```
-Note here we train with an adversarial epsilon of 1 (7 attack steps with step size 0.3), for 200 epochs, with a starting learning rate of 0.1, and multiplying the learning rate by a factor of 0.1 (--step_lr_gamma) every 50 epochs (--step_lr). 
 
 ## Running psychophysics experiments
 
