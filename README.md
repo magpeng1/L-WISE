@@ -5,11 +5,7 @@ The currently leading artificial neural network (ANN) models of the visual ventr
 
 ## How to enhance images using robust networks
 
-### Method 1: Jupyter notebook
-
-@@@@ TODO
-
-### Method 2: python script to enhance a dataset
+### Method 1: python script to enhance a dataset
 
 The script imgproc_code/scripts/enhance.py is designed to "enhance" an entire dataset of images indexed using a "dirmap" csv file (see [Dataset organization section](#dataset-organization-and-how-to-add-new-datasets-to-this-project)) using a robust model. A GPU is required for execution. Please see the arguments You must provide, at minimum:
 * --dest_dir (path to a location where the the enhanced version of the dataset will be saved)
@@ -33,7 +29,7 @@ The additional script imgproc_code/scripts/enhance_vit_aug.py is similar to enha
 python scripts/enhance_vit_aug.py --dest_dir data/imagenet16_xcit_tuned --eps 20 --step_size 0.5 --num_steps 80 --num_augs 10 --batch_size 8 --dirmap_path data/imagenet16/dirmap.csv --objective_type logit --save_originals --dataset_name ImageNet --dataset_path data/imagenet16 --arch xcit_large_12_p16_224 --model_ckpt_path model_ckpts/debenedetti/xcit-l12-ImageNet-eps-4.pth.tar
 ```
 
-### Method 3: bash scripts for enhancing datasets and uploading to S3 with multiple perturbation sizes
+### Method 2: bash scripts for enhancing datasets and uploading to S3 with multiple perturbation sizes
 
 We provide several bash scripts that automate the process of enhancing entire datasets with multiple different perturbation sizes (pixel budget values "epsilon"), and uploading the resulting copies of the dataset to S3 to be used in psychophysics experiments. They are found in the imgproc_code/scripts/batch_enhance directory. Some modification of the dataset/csv/model checkpoint paths will be requried to get these scripts working on your system. 
 
@@ -109,7 +105,10 @@ In order to train/evaluate models on image datasets within the [Robustness libra
 
 To train robust models on new, outside datasets, you must define a new class in imgproc_code/robustness/robustness/datasets.py. You can also add hyperparameter defaults in imgproc_code/robustness/robustness/defaults.py, and custom data augmentations in imgproc_code/robustness/robustness/data_augmentation.py. See also the original [Robustness library documentation](https://robustness.readthedocs.io/en/latest/example_usage/training_lib_part_2.html#training-on-custom-datasets) (this project includes a modified copy of the library)
 
+## Downloading model checkpoints
+
+**Model checkpoints coming soon!**
 
 ## Running psychophysics experiments
 
-@@@@ TODO
+**Code for psychophysical experiments coming soon**
