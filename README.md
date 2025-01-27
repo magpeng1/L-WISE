@@ -3,6 +3,20 @@
 ## Abstract
 The currently leading artificial neural network (ANN) models of the visual ventral stream -- which are derived from a combination of performance optimization and robustification methods -– have demonstrated a remarkable degree of behavioral alignment with humans on visual categorization tasks. Extending upon previous work, we show that not only can these models guide image perturbations that change the induced human category percepts, but they also can enhance human ability to accurately report the original ground truth. Furthermore, we find that the same models can also be used out-of-the-box to predict the proportion of correct human responses to individual images, providing a simple, human-aligned estimator of the relative difficulty of each image. Motivated by these observations, we propose to augment visual learning in humans in a way that improves human categorization accuracy at test time. Our learning augmentation approach consists of (i) selecting images based on their model-estimated recognition difficulty, and (ii) using image perturbations that aid recognition for novice learners. We find that combining these model-based strategies gives rise to test-time categorization accuracy gains of 33-72% relative to control subjects without these interventions, despite using the same number of training feedback trials. Surprisingly, beyond the accuracy gain, the training time for the augmented learning group was also shorter by 20-23%. We demonstrate the efficacy of our approach in a fine-grained categorization task with natural images, as well as tasks in two clinically relevant image domains -- histology and dermoscopy -- where visual learning is notoriously challenging. To the best of our knowledge, this is the first application of ANNs to increase visual learning performance in humans by enhancing category-specific features.
 
+## Obtaining pretrained model checkpoints
+
+Run the following commands from the root project directory to download and extract the ResNet-50 model checkpoints: 
+```
+mkdir -p imgproc_code/model_ckpts
+wget https://github.com/MorganBDT/L-WISE/releases/download/v1.0.0/L-Wise_ckpts.zip
+unzip L-Wise_ckpts.zip -d imgproc_code/model_ckpts
+rm L-Wise_ckpts.zip
+```
+
+We provide adversarially-trained/robustified models for all of the datasets we worked with, along with "vanilla" (trained with stochastic gradient descent) versions otherwise trained with the same hyperparameters (learning rate schedule, batch size, etc.). The name of each .pt model file indicates the dataset it was trained or fine-tuned on, as well as the training epsilon for the robust models (ε=1 or ε=3).
+
+For some of the supplementary experiments in the L-WISE paper, we also used pretrained checkpoints from [Debenedetti et al.](https://github.com/dedeswim/vits-robustness-torch) (XCiT-L12 adversarially pretrained on ImageNet with ε=4), [Yun et al.](https://github.com/clovaai/CutMix-PyTorch) (ResNet-50 pretrained on ImageNet with CutMix), and [Gaziv et al.](https://github.com/ggaziv/Wormholes) (ResNet-50 models adversarially pretrained on ImageNet with several different ε values).
+
 ## How to enhance images using robust networks
 
 ### Method 1: python script to enhance a dataset
@@ -104,10 +118,6 @@ In order to train/evaluate models on image datasets within the [Robustness libra
 ### Setting up new datasets for model training/evaluation
 
 To train robust models on new, outside datasets, you must define a new class in imgproc_code/robustness/robustness/datasets.py. You can also add hyperparameter defaults in imgproc_code/robustness/robustness/defaults.py, and custom data augmentations in imgproc_code/robustness/robustness/data_augmentation.py. See also the original [Robustness library documentation](https://robustness.readthedocs.io/en/latest/example_usage/training_lib_part_2.html#training-on-custom-datasets) (this project includes a modified copy of the library)
-
-## Downloading model checkpoints
-
-**Model checkpoints coming soon!**
 
 ## Running psychophysics experiments
 
