@@ -37,7 +37,6 @@ else:
 
 from .tools import helpers
 from . import attack_steps
-from .imagenet_models import vit
 
 STEPS = {
     'inf': attack_steps.LinfStep,
@@ -301,8 +300,6 @@ class AttackerModel(ch.nn.Module):
         super(AttackerModel, self).__init__()
         self.normalizer = helpers.InputNormalize(dataset.mean, dataset.std)
         self.model = model
-        if isinstance(self.model, vit.ViTWrapper):
-            print("Initializing as vision transformer. We will NOT normalize before passing into the ViTImageProcessor.")
         self.attacker = Attacker(model, dataset)
 
     def forward(self, inp, target=None, make_adv=False, with_latent=False,
@@ -350,10 +347,8 @@ class AttackerModel(ch.nn.Module):
 
             inp = adv
 
-        if isinstance(self.model, vit.ViTWrapper): # Vision transformer has its own normalization setup. 
-            normalized_inp = inp
-        else:
-            normalized_inp = self.normalizer(inp)
+
+        normalized_inp = self.normalizer(inp)
 
         if no_relu and (not with_latent):
             print("WARNING: 'no_relu' has no visible effect if 'with_latent is False.")

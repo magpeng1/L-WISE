@@ -4,7 +4,6 @@ import dill
 import os
 from .tools import helpers, constants
 from .attacker import AttackerModel
-from .imagenet_models import vit
 import transformers
 
 class FeatureExtractor(ch.nn.Module):
@@ -115,15 +114,8 @@ def make_and_restore_model(*_, arch, dataset, resume_path=None,
             try:
                 model.load_state_dict(sd)
             except RuntimeError: # Morgan added (hotfixes for model loading issues in transfer learning....)
-                if isinstance(arch, vit.ViTWrapper):
-                    unneeded_keys = ["model.fc.weight", "model.fc.bias", "attacker.model.fc.weight", "attacker.model.fc.bias"]
-                    print(f"Removing extra unneeded keys ({unneeded_keys})")
-                    for unneeded_key in unneeded_keys:
-                        if unneeded_key in sd:
-                            del sd[unneeded_key]
-                else:
-                    print("Replacing any model.model in saved state_dict with just 'model'")
-                    sd = {k.replace('model.model', 'model'):v for k,v in sd.items()}
+                print("Replacing any model.model in saved state_dict with just 'model'")
+                sd = {k.replace('model.model', 'model'):v for k,v in sd.items()}
 
                 model.load_state_dict(sd)
 
