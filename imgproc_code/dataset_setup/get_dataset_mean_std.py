@@ -7,9 +7,20 @@ from torchvision import transforms
 from robustness.datasets import *
 from torch.utils.data import DataLoader
 from welford import Welford
-import random
 import warnings
 import math
+
+
+def get_args(argv):
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--batch_size', type=int, default=32, help="Batch size")
+    parser.add_argument('--n_workers', type=int, default=8, help="Number of dataloader worker threads")
+    parser.add_argument('--dataset_path', type=str, default="/media/KLAB37/morgan_data/wbc/acevedo_wbc/robustness", help="Path to dataset")
+    parser.add_argument('--dataset_name', type=str, default=None, help="OPTIONAL. Specify only if you want to use the Robustness version of the dataset (which comes with Caveats: it might do its own normalization). This is the name of dataset (see robustness/datasets.py)")
+    parser.add_argument('--sample_frac', type=float, default=1.0, help="Randomly sample only a fraction of the dataset (good estimate in much less time)")
+
+    return parser.parse_args(argv)
 
 
 def get_mean_std(loader, sample_frac=1.0):
@@ -37,18 +48,6 @@ def get_mean_std(loader, sample_frac=1.0):
     std = np.sqrt(var)  # Standard deviation is the square root of variance
 
     return mean, std
-
-
-def get_args(argv):
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('--batch_size', type=int, default=32, help="Batch size")
-    parser.add_argument('--n_workers', type=int, default=8, help="Number of dataloader worker threads")
-    parser.add_argument('--dataset_path', type=str, default="/media/KLAB37/morgan_data/wbc/acevedo_wbc/robustness", help="Path to dataset")
-    parser.add_argument('--dataset_name', type=str, default=None, help="OPTIONAL. Specify only if you want to use the Robustness version of the dataset (which comes with Caveats: it might do its own normalization). This is the name of dataset (see robustness/datasets.py)")
-    parser.add_argument('--sample_frac', type=float, default=1.0, help="Randomly sample only a fraction of the dataset (good estimate in much less time)")
-
-    return parser.parse_args(argv)
 
 
 args = get_args(sys.argv[1:])
