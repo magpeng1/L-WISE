@@ -122,7 +122,7 @@ Standard test data processing (no augmentation) for ImageNet-scale datasets,
 Resized to 256x256 then center cropped to 224x224.
 """
 
-TEST_TRANSFORMS_TOTENSOR = transforms.compose([
+TEST_TRANSFORMS_TOTENSOR = transforms.Compose([
     transforms.ToTensor()
 ]) # Just convert to tensor without any resizing or cropping
 
