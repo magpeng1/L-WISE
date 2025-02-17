@@ -596,60 +596,6 @@ class HAM10000(DataSet):
         if pretrained:
             raise ValueError('ham10000 dataset does not support pytorch_pretrained=True')
         return imagenet_models.__dict__[arch](num_classes=self.num_classes)
-    
-
-class DiagSet(DataSet):
-    """
-    DiagSet Dataset (only one resolution, e.g. 20x)
-    """
-    def __init__(self, data_path='/n/lw_groups/bch/ophth/kreiman/lab/morgan_datasets/diagset/DiagSet-A-png/20x', **kwargs):
-        """
-        """
-        ds_kwargs = {
-            'num_classes': 9,
-            'mean': ch.tensor([0.72995525, 0.47387289, 0.64398567]), # Calculated from random 1% of the 20x dataset
-            'std': ch.tensor([0.13458995, 0.24619623, 0.19515495]),
-            'custom_class': None,
-            'label_mapping': None,
-            'transform_train': da.TRAIN_TRANSFORMS_HIST,
-            'transform_test': da.TEST_TRANSFORMS_HIST
-        }
-        ds_kwargs = self.override_args(ds_kwargs, kwargs)
-        super(DiagSet, self).__init__('diagset', data_path, **ds_kwargs)
-
-    def get_model(self, arch, pretrained):
-        """
-        """
-        if pretrained:
-            raise ValueError('diagset dataset does not support pytorch_pretrained=True')
-        return imagenet_models.__dict__[arch](num_classes=self.num_classes)
-    
-
-class BRACS(DataSet):
-    """
-    BRACS breast cancer dataset
-    """
-    def __init__(self, data_path='/n/lw_groups/bch/ophth/kreiman/lab/morgan_datasets/BRACS/BRACS_ROI_patches', **kwargs):
-        """
-        """
-        ds_kwargs = {
-            'num_classes': 7,
-            'mean': ch.tensor([0.72538384, 0.55898657, 0.69564772]), # Calculated from random 10% of the dataset
-            'std': ch.tensor([0.1861168, 0.223086, 0.164824]),
-            'custom_class': None,
-            'label_mapping': None,
-            'transform_train': da.TRAIN_TRANSFORMS_HIST,
-            'transform_test': da.TEST_TRANSFORMS_HIST
-        }
-        ds_kwargs = self.override_args(ds_kwargs, kwargs)
-        super(BRACS, self).__init__('bracs', data_path, **ds_kwargs)
-
-    def get_model(self, arch, pretrained):
-        """
-        """
-        if pretrained:
-            raise ValueError('BRACS dataset does not support pytorch_pretrained=True')
-        return imagenet_models.__dict__[arch](num_classes=self.num_classes)
 
 
 DATASETS = {
@@ -665,8 +611,6 @@ DATASETS = {
     'inat': inat,
     'idaea4': idaea4,
     'ham10000': HAM10000,
-    'diagset': DiagSet,
-    'bracs': BRACS,
 }
 '''
 Dictionary of datasets. A dataset class can be accessed as:
