@@ -89,6 +89,8 @@ TRAIN_TRANSFORMS_HIST = transforms.Compose([
     ])
 
 TEST_TRANSFORMS_HIST = transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
         transforms.ToTensor(),
     ])
 
@@ -119,6 +121,10 @@ TEST_TRANSFORMS_IMAGENET = transforms.Compose([
 Standard test data processing (no augmentation) for ImageNet-scale datasets,
 Resized to 256x256 then center cropped to 224x224.
 """
+
+TEST_TRANSFORMS_TOTENSOR = transforms.compose([
+    transforms.ToTensor()
+]) # Just convert to tensor without any resizing or cropping
 
 # Data Augmentation defaults
 TRAIN_TRANSFORMS_DEFAULT = lambda size: transforms.Compose([
