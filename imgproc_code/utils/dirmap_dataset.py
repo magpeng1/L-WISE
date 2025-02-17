@@ -15,7 +15,7 @@ def custom_collate(batch):
     return images, labels, idxs
 
 class DirmapDataset(Dataset):
-    def __init__(self, csv_file, transform=None, class_num_col='class_num', dataset_path=None, relative_path=False, split=None, mean=None, std=None):
+    def __init__(self, csv_file, transform=None, class_num_col='class_num', dataset_path=None, relative_path=False, split=None, mean=None, std=None, use_df_idx=False):
         if isinstance(csv_file, str):
             self.df = pd.read_csv(csv_file)
         elif isinstance(csv_file, pd.DataFrame):
@@ -42,6 +42,7 @@ class DirmapDataset(Dataset):
 
         self.mean = mean
         self.std = std
+        self.use_df_idx = use_df_idx
 
 
     def __len__(self):
@@ -72,4 +73,10 @@ class DirmapDataset(Dataset):
             print("WARNING: no column in dataframe called", self.class_num_col, ", reverting to 'class_num'")
             self.class_num_col = 'class_num'
             class_num = row[self.class_num_col]
-        return image, int(class_num), idx  # Return consistent format
+
+        if self.use_df_idx:
+            idx_return = row.name
+        else:
+            idx_return = idx
+        
+        return image, int(class_num), idx_return  

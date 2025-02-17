@@ -4,8 +4,8 @@
 *.h5
 *.code-workspace
 .ipynb_checkpoints
+__pycache__
 
-/__pycache__/
 .idea/
 venvs/
 imgproc_code/venvs/
