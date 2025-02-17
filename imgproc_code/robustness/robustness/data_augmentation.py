@@ -144,21 +144,3 @@ Generic test data transform (no augmentation) to complement
 :meth:`robustness.data_augmentation.TEST_TRANSFORMS_DEFAULT`, takes in an image
 side length.
 """
-
-
-def get_vit_transforms(is_train, model_name="google/vit-base-patch16-224"):
-    processor = ViTImageProcessor.from_pretrained(model_name)
-    
-    if is_train:
-        return transforms.Compose([
-            transforms.RandomResizedCrop(224),
-            transforms.RandomHorizontalFlip(),
-            transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0.1),
-            transforms.Lambda(lambda img: processor(images=img, return_tensors="pt")['pixel_values'].squeeze())
-        ])
-    else:
-        return transforms.Compose([
-            transforms.Resize(256),
-            transforms.CenterCrop(224),
-            transforms.Lambda(lambda img: processor(images=img, return_tensors="pt")['pixel_values'].squeeze())
-        ])
