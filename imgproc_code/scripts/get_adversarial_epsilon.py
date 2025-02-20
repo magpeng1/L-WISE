@@ -3,8 +3,6 @@ Run from root project folder using "python scripts/get_adversarial_epsilon.py ..
 """
 
 import sys
-from pathlib import Path
-sys.path.append(str(Path(__file__).parent.parent)) # Add parent directory to pythonpath
 import argparse
 import json
 import tqdm
@@ -14,7 +12,7 @@ from torch.utils.data import DataLoader
 from torchvision.transforms import Compose, Resize, ToTensor
 from robustness.datasets import *
 from robustness.model_utils import make_and_restore_model
-from utils.dirmap_dataset import DirmapDataset, custom_collate
+from lwise_imgproc_utils.dirmap_dataset import DirmapDataset, custom_collate
 
 def get_args(argv):
     parser = argparse.ArgumentParser()

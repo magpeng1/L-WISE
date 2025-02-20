@@ -1,4 +1,9 @@
 *.png
+*.pdf
+*.csv
+*.svg
+*.eps
+*.json
 *.o
 *:Zone.Identifier
 *.h5
@@ -8,9 +13,18 @@ __pycache__
 
 .idea/
 venvs/
+
 imgproc_code/venvs/
 imgproc_code/data/
 imgproc_code/model_ckpts/
 imgproc_code/train_output/
 imgproc_code/o2_results/
 imgproc_code/lw_results/
+imgproc_code/lwise_imgproc_utils/lwise_imgproc_utils.egg-info
+
+psych_code/results/
+psych_code/deployed_experiments/
+psych_code/deploy_logs/
+psych_code/images/
+psych_code/psych_data/
+psych_code/lwise_psych_modules.egg-info

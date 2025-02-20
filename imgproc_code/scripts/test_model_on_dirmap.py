@@ -1,10 +1,7 @@
 """Simple way to test models and generate confusion matrices, only works for ResNet50 though. A more feature-rich version is test_model_on_dirmap_get_gt_logit.py
 """
 
-import os
 import sys
-from pathlib import Path
-sys.path.append(str(Path(__file__).parent.parent)) # Add parent directory to pythonpath
 import argparse
 from sklearn.metrics import confusion_matrix, accuracy_score
 import pandas as pd
@@ -15,8 +12,7 @@ from torch.utils.data import DataLoader
 from torchvision.transforms import Compose, Resize, ToTensor, CenterCrop
 import seaborn as sns
 import matplotlib.pyplot as plt
-from utils.dirmap_dataset import DirmapDataset, custom_collate
-from utils.mapped_models import imagenet_mapped_model
+from lwise_imgproc_utils.dirmap_dataset import DirmapDataset, custom_collate
 from robustness.datasets import *
 from robustness.model_utils import make_and_restore_model
 

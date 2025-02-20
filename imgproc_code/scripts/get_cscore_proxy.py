@@ -1,7 +1,5 @@
 import os
 import sys
-from pathlib import Path
-sys.path.append(str(Path(__file__).parent.parent)) # Add parent directory to pythonpath
 import argparse
 import torch
 from torch.utils.data import DataLoader
@@ -10,7 +8,7 @@ from robustness.model_utils import make_and_restore_model
 from robustness.datasets import *
 from tqdm import tqdm
 import json
-from utils.dirmap_dataset import DirmapDataset, custom_collate
+from lwise_imgproc_utils.dirmap_dataset import DirmapDataset, custom_collate
 
 def get_args(argv):
     parser = argparse.ArgumentParser()

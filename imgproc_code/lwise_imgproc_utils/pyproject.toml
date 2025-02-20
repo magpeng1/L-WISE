@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lwise_imgproc_utils"
+version = "0.0.1"
+description = "Image processing utilities for L-WISE project"
+requires-python = ">=3.11"
+authors = [
+    {name = "Morgan Talbot", email = "mtalbot@mit.edu"},
+]
+
+[tool.setuptools]
+packages = ["lwise_imgproc_utils"]

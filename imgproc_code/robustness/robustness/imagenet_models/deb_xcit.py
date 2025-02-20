@@ -2,10 +2,7 @@
 Code from: Debenedetti, Edoardo, Vikash Sehwag, and Prateek Mittal. "A light recipe to train robust vision transformers." In 2023 IEEE Conference on Secure and Trustworthy Machine Learning (SaTML), pp. 225-253. IEEE, 2023.
 '''
 
-from timm.models import cait, xcit
-from timm.models.helpers import build_model_with_cfg
-from timm.models.registry import register_model
-from torch import nn
+from timm.models import cait, xcit, build_model_with_cfg, register_model
 
 default_cfgs = {
     'cait_s12_224': cait._cfg(input_size=(3, 224, 224)),

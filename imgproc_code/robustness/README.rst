@@ -2,6 +2,8 @@ robustness package
 ==================
 Install via ``pip``: ``pip install robustness``
 
+Please note: this is a version of the [original Robustness library](https://github.com/MadryLab/robustness) that has been modified for experiments underlying the L-WISE paper. 
+
 Read the docs: https://robustness.readthedocs.io/en/latest/index.html
 
 ``robustness`` is a package we (students in the `MadryLab <http://madry-lab.ml>`_) created

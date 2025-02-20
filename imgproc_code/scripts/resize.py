@@ -4,14 +4,12 @@ Run from root project folder using "python resize.py ..."
 
 import os
 import sys
-from pathlib import Path
-sys.path.append(str(Path(__file__).parent.parent)) # Add parent directory to pythonpath
 import argparse
 import time
 from torchvision.utils import save_image
 from torch.utils.data import DataLoader
 from torchvision.transforms import Compose, Resize, ToTensor, CenterCrop
-from utils.dirmap_dataset import DirmapDataset, custom_collate
+from lwise_imgproc_utils.dirmap_dataset import DirmapDataset, custom_collate
 
 
 def get_args(argv):

@@ -5,8 +5,6 @@ Run from root project folder using "python scripts/enhance_vit_aug.py ..."
 
 import os
 import sys
-from pathlib import Path
-sys.path.append(str(Path(__file__).parent.parent)) # Add parent directory to pythonpath
 import argparse
 from tqdm import trange
 import random
@@ -21,10 +19,10 @@ import torchvision.transforms.functional as TF
 import torch.nn.functional as F
 from robustness.datasets import *
 from robustness.model_utils import make_and_restore_model
-from utils.dirmap_dataset import DirmapDataset, custom_collate
-from utils.mapped_models import imagenet_mapped_model
-from utils.custom_losses import *
-from utils.gif_utils import *
+from lwise_imgproc_utils.dirmap_dataset import DirmapDataset, custom_collate
+from lwise_imgproc_utils.mapped_models import imagenet_mapped_model
+from lwise_imgproc_utils.custom_losses import *
+from lwise_imgproc_utils.gif_utils import *
 from robustness.tools.constants import IMAGENET_16_RANGES as i16_ranges
 import robustness
 from robustness import attack_steps  # Assuming attack_steps.py is in the PYTHONPATH

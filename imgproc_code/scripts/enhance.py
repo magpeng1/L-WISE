@@ -4,8 +4,6 @@ Run from imgproc_code folder using "python scripts/enhance.py ..."
 
 import os
 import sys
-from pathlib import Path
-sys.path.append(str(Path(__file__).parent.parent)) # Add parent directory to pythonpath
 import argparse
 import pandas as pd
 from matplotlib import pyplot as plt
@@ -19,10 +17,10 @@ from torchvision.transforms import Compose, ToTensor
 import torchvision.transforms.functional as TF
 from robustness.datasets import *
 from robustness.model_utils import make_and_restore_model
-from utils.dirmap_dataset import DirmapDataset, custom_collate
-from utils.mapped_models import imagenet_mapped_model
-from utils.custom_losses import *
-from utils.gif_utils import *
+from lwise_imgproc_utils.dirmap_dataset import DirmapDataset, custom_collate
+from lwise_imgproc_utils.mapped_models import imagenet_mapped_model
+from lwise_imgproc_utils.custom_losses import *
+from lwise_imgproc_utils.gif_utils import *
 from robustness.tools.constants import IMAGENET_16_RANGES as i16_ranges
 from robustness import data_augmentation
 import timm

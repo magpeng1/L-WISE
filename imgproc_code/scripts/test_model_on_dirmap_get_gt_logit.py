@@ -4,8 +4,6 @@ This script will save a .csv file at the same location as the original .csv file
 
 import os
 import sys
-from pathlib import Path
-sys.path.append(str(Path(__file__).parent.parent)) # Add parent directory to pythonpath
 import argparse
 from sklearn.metrics import confusion_matrix, accuracy_score
 import pandas as pd
@@ -17,8 +15,8 @@ from torch.utils.data import DataLoader
 from torchvision.transforms import Compose, Resize, ToTensor, CenterCrop
 import seaborn as sns
 import matplotlib.pyplot as plt
-from utils.dirmap_dataset import DirmapDataset, custom_collate
-from utils.mapped_models import imagenet_mapped_model
+from lwise_imgproc_utils.dirmap_dataset import DirmapDataset, custom_collate
+from lwise_imgproc_utils.mapped_models import imagenet_mapped_model
 from robustness.datasets import *
 from robustness.model_utils import make_and_restore_model
 from robustness.imagenet_models import *
