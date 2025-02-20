@@ -1,0 +1,209 @@
+session_config:
+  - train_1:
+    n_trials_per_class_train: 0
+    n_trials_per_class_val: 0
+    n_trials_per_class_test: 8
+    n_calibration_trials: 2
+    class_balanced: true
+    n_repeats_of_one_stim: 0
+    choice_image_bucket_name: "morgan-fine-grained-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: false
+    show_feedback: true
+    conditional_trial_types: [
+      {"natural": {"bucket": "morgan-mhist-full-natural"}},
+      {"enhancement_taper_curriculum_sampling": {"bucket": "morgan-mhist-full-8-0dot5-16-logit-diverge", "max_difficulty_selection": 0.1, "difficulty_curriculum": true}},
+    ]
+  - train_2:
+    n_trials_per_class_train: 0
+    n_trials_per_class_val: 0
+    n_trials_per_class_test: 8
+    n_calibration_trials: 2
+    class_balanced: true
+    n_repeats_of_one_stim: 1
+    choice_image_bucket_name: "morgan-fine-grained-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: false
+    show_feedback: true
+    conditional_trial_types: [
+      {"natural": {"bucket": "morgan-mhist-full-natural"}},
+      {"enhancement_taper_curriculum_sampling": {"bucket": "morgan-mhist-full-4-0dot5-8-logit-diverge", "max_difficulty_selection": 0.25, "difficulty_curriculum": true}},
+    ]
+  - train_3:
+    n_trials_per_class_train: 0
+    n_trials_per_class_val: 0
+    n_trials_per_class_test: 8
+    n_calibration_trials: 2
+    class_balanced: true
+    n_repeats_of_one_stim: 1
+    choice_image_bucket_name: "morgan-fine-grained-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: false
+    show_feedback: true
+    conditional_trial_types: [
+      {"natural": {"bucket": "morgan-mhist-full-natural"}},
+      {"enhancement_taper_curriculum_sampling": {"bucket": "morgan-mhist-full-2-0dot5-4-logit-diverge", "max_difficulty_selection": 0.4, "difficulty_curriculum": true}},
+    ]
+  - train_4:
+    n_trials_per_class_train: 0
+    n_trials_per_class_val: 0
+    n_trials_per_class_test: 8
+    n_calibration_trials: 2
+    class_balanced: true
+    n_repeats_of_one_stim: 1
+    choice_image_bucket_name: "morgan-fine-grained-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: false
+    show_feedback: true
+    conditional_trial_types: [
+      {"natural": {"bucket": "morgan-mhist-full-natural"}},
+      {"enhancement_taper_curriculum_sampling": {"bucket": "morgan-mhist-full-1-0dot5-2-logit-diverge", "max_difficulty_selection": 0.55, "difficulty_curriculum": true}},
+    ]
+  - train_5:
+    n_trials_per_class_train: 0
+    n_trials_per_class_val: 0
+    n_trials_per_class_test: 8
+    n_calibration_trials: 2
+    class_balanced: true
+    n_repeats_of_one_stim: 1
+    choice_image_bucket_name: "morgan-fine-grained-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: false
+    show_feedback: true
+    conditional_trial_types: [
+      {"natural": {"bucket": "morgan-mhist-full-natural"}},
+      {"enhancement_taper_curriculum_sampling": {"bucket": "morgan-mhist-full-0dot5-0dot5-1-logit-diverge", "max_difficulty_selection": 0.7, "difficulty_curriculum": true}},
+    ]
+  - train_6:
+    n_trials_per_class_train: 0
+    n_trials_per_class_val: 0
+    n_trials_per_class_test: 8
+    n_calibration_trials: 2
+    class_balanced: true
+    n_repeats_of_one_stim: 1
+    choice_image_bucket_name: "morgan-fine-grained-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: false
+    show_feedback: true
+    conditional_trial_types: [
+      {"natural": {"bucket": "morgan-mhist-full-natural"}},
+      {"enhancement_taper_curriculum_sampling": {"bucket": "morgan-mhist-full-0dot25-0dot5-1-logit-diverge", "max_difficulty_selection": 0.85, "difficulty_curriculum": true}},
+    ]
+  - train_7:
+    n_trials_per_class_train: 0
+    n_trials_per_class_val: 0
+    n_trials_per_class_test: 8
+    n_calibration_trials: 2
+    class_balanced: true
+    n_repeats_of_one_stim: 1
+    choice_image_bucket_name: "morgan-fine-grained-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: false
+    show_feedback: true
+    conditional_trial_types: [
+      {"natural": {"bucket": "morgan-mhist-full-natural"}},
+      {"enhancement_taper_curriculum_sampling": {"bucket": "morgan-mhist-full-natural"}},
+    ]
+  - train_8:
+    n_trials_per_class_train: 0
+    n_trials_per_class_val: 0
+    n_trials_per_class_test: 8
+    n_calibration_trials: 2
+    class_balanced: true
+    n_repeats_of_one_stim: 1
+    choice_image_bucket_name: "morgan-fine-grained-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: false
+    show_feedback: true
+    conditional_trial_types: [
+      {"natural": {"bucket": "morgan-mhist-full-natural"}},
+      {"enhancement_taper_curriculum_sampling": {"bucket": "morgan-mhist-full-natural"}},
+    ]
+  - test_1:
+    bonus_usd_if_correct: 0.01
+    show_test_instructions: true
+    n_trials_per_class_train: 0
+    n_trials_per_class_val: 0
+    n_trials_per_class_test: 10
+    n_calibration_trials: 2
+    class_balanced: true
+    n_repeats_of_one_stim: 3
+    choice_image_bucket_name: "morgan-fine-grained-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: false
+    show_feedback: false
+    conditional_trial_types: [
+      {"natural": {"bucket": "morgan-mhist-full-natural"}},
+      {"enhancement_taper_curriculum_sampling": {"bucket": "morgan-mhist-full-natural"}},
+    ]
+  - test_2:
+    bonus_usd_if_correct: 0.01
+    show_test_instructions: true
+    n_trials_per_class_train: 0
+    n_trials_per_class_val: 0
+    n_trials_per_class_test: 10
+    n_calibration_trials: 2
+    class_balanced: true
+    n_repeats_of_one_stim: 3
+    choice_image_bucket_name: "morgan-fine-grained-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: false
+    show_feedback: false
+    conditional_trial_types: [
+      {"natural": {"bucket": "morgan-mhist-full-natural"}},
+      {"enhancement_taper_curriculum_sampling": {"bucket": "morgan-mhist-full-natural"}},
+    ]
+
+trial_config:
+  curriculum_num_blocks: 6
+  keypress_fj_response: true
+  reward_duration_msec: null
+  incorrect_duration_msec: null
+  show_feedback: true
+  correct_feedback_lockout_duration_msec: 500
+  incorrect_feedback_lockout_duration_msec: 1500
+  stimulus_duration_msec: 0
+  calibration_stimulus_duration_msec: 0
+  post_stimulus_delay_duration_msec: 0
+  keep_stimulus_on: false
+  stimulus_width_degrees: 12
+  choice_width_degrees_default: 4
+  choice_duration_msec: 10000
+  pre_choice_lockout_delay_duration_msec: 200
+  intertrial_delay_duration_msec: 200
+  bonus_usd_if_correct: 0
+  choice_names_order: [
+    "hp", 
+    "ssa", 
+  ]
+  choice_names_order_shuffle: true
+  repeat_trial_type: "natural" # Set to the trial type that will be used for repeats, or null if there is only one trial type. 
+  repeat_stimulus_split: "test" # Which split to draw the repeat stimulus from. 'val' is the default
+  choice_names_aliases: {
+    "hp": "Benign", 
+    "ssa": "Malignant", 
+  }
+  choice_aliases_random_shuffle: false
+  choice_url_suffix: "_text_icon.png"
+  query_string: "Press 'F' or 'J' on your keyboard to make your choice"
+  feedback_correct_url: "https://miljspsych.s3.amazonaws.com/resources/assets/images/feedback_is_correct_image.png"
+  feedback_incorrect_url: "https://miljspsych.s3.amazonaws.com/resources/assets/images/feedback_is_incorrect_image.png"
+
+hit_config:
+  title: "Challenge: learn to tell apart similar-looking microscopy images"
+  description: "View 180 photos and identify the pathologcal finding present in each photo. Learn by trial and error, and earn a bonus of $5.00 if you acheive more than 75% accuracy on the test phase (or $10 above 85%, or $20 above 95%). Your participation will contribute towards finding better ways of teaching medical trainees to diagnose diseases more accurately using medical images. PLEASE NOTE: it can be very hard to get high accuracy on this task, even for medical professionals - please try your best and don't give up!"
+  reward: 3.50 # Estimated 14-minute completion time
+  num_respondents: 9
+  max_time_seconds: 2700  # 1800 = 30 mins, 2700 = 45 mins, 3600 = 1 hour
+  lifetime_seconds: 259200  # 259200 = 3 days, 86400 = 1 day
+  frame_height: 0  # The height of the task frame (if zero, resizes automatically)

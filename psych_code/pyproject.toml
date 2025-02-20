@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lwise_psych_modules"
+version = "0.0.1"
+description = "Utilities for running image classification psychophysics experiments (primarily using AWS and Prolific), developed for the L-WISE paper"
+requires-python = ">=3.11"
+authors = [
+    {name = "Morgan Talbot", email = "mtalbot@mit.edu"},
+]
+
+[tool.setuptools]
+packages = ["lwise_psych_modules"]

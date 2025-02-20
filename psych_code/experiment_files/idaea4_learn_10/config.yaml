@@ -1,0 +1,262 @@
+session_config:
+  - train_1:
+    n_trials_per_class_train: 4
+    n_trials_per_class_val: 0
+    n_trials_per_class_test: 0
+    n_calibration_trials: 2
+    class_balanced: true
+    n_repeats_of_one_stim: 0
+    choice_image_bucket_name: "morgan-fine-grained-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: false
+    show_feedback: true
+    conditional_trial_types: [
+      {"natural": {"bucket": "morgan-idaea4-natural"}},
+      {"natural": {"bucket": "morgan-idaea4-natural"}},
+      {"curriculum_sampling": {"bucket": "morgan-idaea4-natural", "max_difficulty_selection": 0.1, "difficulty_curriculum": true}},
+      {"curriculum_sampling_shuffle": {"bucket": "morgan-idaea4-natural", "max_difficulty_selection": 0.1, "difficulty_curriculum": true, "combine_and_shuffle": true}},
+      {"enhancement_taper": {"bucket": "morgan-idaea4-8-0dot5-16-logit-diverge"}},
+      {"enhancement_taper_shuffle": {"bucket": "morgan-idaea4-8-0dot5-16-logit-diverge", "combine_and_shuffle": true}},
+      {"enhancement_taper_curriculum_sampling": {"bucket": "morgan-idaea4-8-0dot5-16-logit-diverge", "max_difficulty_selection": 0.1, "difficulty_curriculum": true}},
+    ]
+  - train_2:
+    n_trials_per_class_train: 4
+    n_trials_per_class_val: 0
+    n_trials_per_class_test: 0
+    n_calibration_trials: 2
+    class_balanced: true
+    n_repeats_of_one_stim: 1
+    choice_image_bucket_name: "morgan-fine-grained-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: false
+    show_feedback: true
+    conditional_trial_types: [
+      {"natural": {"bucket": "morgan-idaea4-natural"}},
+      {"natural": {"bucket": "morgan-idaea4-natural"}},
+      {"curriculum_sampling": {"bucket": "morgan-idaea4-natural", "max_difficulty_selection": 0.25, "difficulty_curriculum": true}},
+      {"curriculum_sampling_shuffle": {"bucket": "morgan-idaea4-natural", "max_difficulty_selection": 0.25, "difficulty_curriculum": true, "combine_and_shuffle": true}},
+      {"enhancement_taper": {"bucket": "morgan-idaea4-4-0dot5-8-logit-diverge"}},
+      {"enhancement_taper_shuffle": {"bucket": "morgan-idaea4-4-0dot5-8-logit-diverge", "combine_and_shuffle": true}},
+      {"enhancement_taper_curriculum_sampling": {"bucket": "morgan-idaea4-4-0dot5-8-logit-diverge", "max_difficulty_selection": 0.25, "difficulty_curriculum": true}},
+    ]
+  - train_3:
+    n_trials_per_class_train: 4
+    n_trials_per_class_val: 0
+    n_trials_per_class_test: 0
+    n_calibration_trials: 2
+    class_balanced: true
+    n_repeats_of_one_stim: 1
+    choice_image_bucket_name: "morgan-fine-grained-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: false
+    show_feedback: true
+    conditional_trial_types: [
+      {"natural": {"bucket": "morgan-idaea4-natural"}},
+      {"natural": {"bucket": "morgan-idaea4-natural"}},
+      {"curriculum_sampling": {"bucket": "morgan-idaea4-natural", "max_difficulty_selection": 0.4, "difficulty_curriculum": true}},
+      {"curriculum_sampling_shuffle": {"bucket": "morgan-idaea4-natural", "max_difficulty_selection": 0.4, "difficulty_curriculum": true, "combine_and_shuffle": true}},
+      {"enhancement_taper": {"bucket": "morgan-idaea4-2-0dot5-4-logit-diverge"}},
+      {"enhancement_taper_shuffle": {"bucket": "morgan-idaea4-2-0dot5-4-logit-diverge", "combine_and_shuffle": true}},
+      {"enhancement_taper_curriculum_sampling": {"bucket": "morgan-idaea4-2-0dot5-4-logit-diverge", "max_difficulty_selection": 0.4, "difficulty_curriculum": true}},
+    ]
+  - train_4:
+    n_trials_per_class_train: 4
+    n_trials_per_class_val: 0
+    n_trials_per_class_test: 0
+    n_calibration_trials: 2
+    class_balanced: true
+    n_repeats_of_one_stim: 1
+    choice_image_bucket_name: "morgan-fine-grained-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: false
+    show_feedback: true
+    conditional_trial_types: [
+      {"natural": {"bucket": "morgan-idaea4-natural"}},
+      {"natural": {"bucket": "morgan-idaea4-natural"}},
+      {"curriculum_sampling": {"bucket": "morgan-idaea4-natural", "max_difficulty_selection": 0.55, "difficulty_curriculum": true}},
+      {"curriculum_sampling_shuffle": {"bucket": "morgan-idaea4-natural", "max_difficulty_selection": 0.55, "difficulty_curriculum": true, "combine_and_shuffle": true}},
+      {"enhancement_taper": {"bucket": "morgan-idaea4-1-0dot5-2-logit-diverge"}},
+      {"enhancement_taper_shuffle": {"bucket": "morgan-idaea4-1-0dot5-2-logit-diverge", "combine_and_shuffle": true}},
+      {"enhancement_taper_curriculum_sampling": {"bucket": "morgan-idaea4-1-0dot5-2-logit-diverge", "max_difficulty_selection": 0.55, "difficulty_curriculum": true}},
+    ]
+  - train_5:
+    n_trials_per_class_train: 4
+    n_trials_per_class_val: 0
+    n_trials_per_class_test: 0
+    n_calibration_trials: 2
+    class_balanced: true
+    n_repeats_of_one_stim: 1
+    choice_image_bucket_name: "morgan-fine-grained-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: false
+    show_feedback: true
+    conditional_trial_types: [
+      {"natural": {"bucket": "morgan-idaea4-natural"}},
+      {"natural": {"bucket": "morgan-idaea4-natural"}},
+      {"curriculum_sampling": {"bucket": "morgan-idaea4-natural", "max_difficulty_selection": 0.7, "difficulty_curriculum": true}},
+      {"curriculum_sampling_shuffle": {"bucket": "morgan-idaea4-natural", "max_difficulty_selection": 0.7, "difficulty_curriculum": true, "combine_and_shuffle": true}},
+      {"enhancement_taper": {"bucket": "morgan-idaea4-0dot5-0dot5-1-logit-diverge"}},
+      {"enhancement_taper_shuffle": {"bucket": "morgan-idaea4-0dot5-0dot5-1-logit-diverge", "combine_and_shuffle": true}},
+      {"enhancement_taper_curriculum_sampling": {"bucket": "morgan-idaea4-0dot5-0dot5-1-logit-diverge", "max_difficulty_selection": 0.7, "difficulty_curriculum": true}},
+    ]
+  - train_6:
+    n_trials_per_class_train: 4
+    n_trials_per_class_val: 0
+    n_trials_per_class_test: 0
+    n_calibration_trials: 2
+    class_balanced: true
+    n_repeats_of_one_stim: 1
+    choice_image_bucket_name: "morgan-fine-grained-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: false
+    show_feedback: true
+    conditional_trial_types: [
+      {"natural": {"bucket": "morgan-idaea4-natural"}},
+      {"natural": {"bucket": "morgan-idaea4-natural"}},
+      {"curriculum_sampling": {"bucket": "morgan-idaea4-natural", "max_difficulty_selection": 0.85, "difficulty_curriculum": true}},
+      {"curriculum_sampling_shuffle": {"bucket": "morgan-idaea4-natural", "max_difficulty_selection": 0.85, "difficulty_curriculum": true, "combine_and_shuffle": true}},
+      {"enhancement_taper": {"bucket": "morgan-idaea4-0dot25-0dot5-1-logit-diverge"}},
+      {"enhancement_taper_shuffle": {"bucket": "morgan-idaea4-0dot25-0dot5-1-logit-diverge", "combine_and_shuffle": true}},
+      {"enhancement_taper_curriculum_sampling": {"bucket": "morgan-idaea4-0dot25-0dot5-1-logit-diverge", "max_difficulty_selection": 0.85, "difficulty_curriculum": true}},
+    ]
+  - train_7:
+    n_trials_per_class_train: 4
+    n_trials_per_class_val: 0
+    n_trials_per_class_test: 0
+    n_calibration_trials: 2
+    class_balanced: true
+    n_repeats_of_one_stim: 1
+    choice_image_bucket_name: "morgan-fine-grained-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: false
+    show_feedback: true
+    conditional_trial_types: [
+      {"natural": {"bucket": "morgan-idaea4-natural"}},
+      {"natural": {"bucket": "morgan-idaea4-natural"}},
+      {"curriculum_sampling": {"bucket": "morgan-idaea4-natural"}},
+      {"curriculum_sampling_shuffle": {"bucket": "morgan-idaea4-natural"}},
+      {"enhancement_taper": {"bucket": "morgan-idaea4-natural"}},
+      {"enhancement_taper_shuffle": {"bucket": "morgan-idaea4-natural"}},
+      {"enhancement_taper_curriculum_sampling": {"bucket": "morgan-idaea4-natural"}},
+    ]
+  - train_8:
+    n_trials_per_class_train: 4
+    n_trials_per_class_val: 0
+    n_trials_per_class_test: 0
+    n_calibration_trials: 2
+    class_balanced: true
+    n_repeats_of_one_stim: 1
+    choice_image_bucket_name: "morgan-fine-grained-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: false
+    show_feedback: true
+    conditional_trial_types: [
+      {"natural": {"bucket": "morgan-idaea4-natural"}},
+      {"natural": {"bucket": "morgan-idaea4-natural"}},
+      {"curriculum_sampling": {"bucket": "morgan-idaea4-natural"}},
+      {"curriculum_sampling_shuffle": {"bucket": "morgan-idaea4-natural"}},
+      {"enhancement_taper": {"bucket": "morgan-idaea4-natural"}},
+      {"enhancement_taper_shuffle": {"bucket": "morgan-idaea4-natural"}},
+      {"enhancement_taper_curriculum_sampling": {"bucket": "morgan-idaea4-natural"}},
+    ]
+  - test_1:
+    bonus_usd_if_correct: 0.01
+    show_test_instructions: true
+    n_trials_per_class_train: 0
+    n_trials_per_class_val: 5
+    n_trials_per_class_test: 0
+    n_calibration_trials: 2
+    class_balanced: true
+    n_repeats_of_one_stim: 3
+    choice_image_bucket_name: "morgan-fine-grained-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: false
+    show_feedback: false
+    conditional_trial_types: [
+      {"natural": {"bucket": "morgan-idaea4-natural"}},
+      {"natural": {"bucket": "morgan-idaea4-natural"}},
+      {"curriculum_sampling": {"bucket": "morgan-idaea4-natural"}},
+      {"curriculum_sampling_shuffle": {"bucket": "morgan-idaea4-natural"}},
+      {"enhancement_taper": {"bucket": "morgan-idaea4-natural"}},
+      {"enhancement_taper_shuffle": {"bucket": "morgan-idaea4-natural"}},
+      {"enhancement_taper_curriculum_sampling": {"bucket": "morgan-idaea4-natural"}},
+    ]
+  - test_2:
+    bonus_usd_if_correct: 0.01
+    show_test_instructions: true
+    n_trials_per_class_train: 0
+    n_trials_per_class_val: 5
+    n_trials_per_class_test: 0
+    n_calibration_trials: 2
+    class_balanced: true
+    n_repeats_of_one_stim: 3
+    choice_image_bucket_name: "morgan-fine-grained-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: false
+    show_feedback: false
+    conditional_trial_types: [
+      {"natural": {"bucket": "morgan-idaea4-natural"}},
+      {"natural": {"bucket": "morgan-idaea4-natural"}},
+      {"curriculum_sampling": {"bucket": "morgan-idaea4-natural"}},
+      {"curriculum_sampling_shuffle": {"bucket": "morgan-idaea4-natural"}},
+      {"enhancement_taper": {"bucket": "morgan-idaea4-natural"}},
+      {"enhancement_taper_shuffle": {"bucket": "morgan-idaea4-natural"}},
+      {"enhancement_taper_curriculum_sampling": {"bucket": "morgan-idaea4-natural"}},
+    ]
+
+trial_config:
+  curriculum_num_blocks: 6
+  keypress_fj_response: false
+  reward_duration_msec: null
+  incorrect_duration_msec: null
+  show_feedback: true
+  correct_feedback_lockout_duration_msec: 500
+  incorrect_feedback_lockout_duration_msec: 1500
+  stimulus_duration_msec: 0
+  calibration_stimulus_duration_msec: 0
+  post_stimulus_delay_duration_msec: 0
+  keep_stimulus_on: false
+  stimulus_width_degrees: 12
+  choice_width_degrees_default: 4
+  choice_duration_msec: 10000
+  pre_choice_lockout_delay_duration_msec: 200
+  intertrial_delay_duration_msec: 200
+  bonus_usd_if_correct: 0
+  choice_names_order: [
+    "01233_Animalia_Arthropoda_Insecta_Lepidoptera_Geometridae_Idaea_aversata", 
+    "01234_Animalia_Arthropoda_Insecta_Lepidoptera_Geometridae_Idaea_biselata", 
+    "01239_Animalia_Arthropoda_Insecta_Lepidoptera_Geometridae_Idaea_seriata", 
+    "01240_Animalia_Arthropoda_Insecta_Lepidoptera_Geometridae_Idaea_tacturata",
+  ] # Set to null if no specific order
+  repeat_trial_type: "natural" # Set to the trial type that will be used for repeats, or null if there is only one trial type. 
+  repeat_stimulus_split: "train" # Which split to draw the repeat stimulus from. 'val' is the default
+  choice_names_aliases: {
+    "01233_Animalia_Arthropoda_Insecta_Lepidoptera_Geometridae_Idaea_aversata": "Leda", 
+    "01234_Animalia_Arthropoda_Insecta_Lepidoptera_Geometridae_Idaea_biselata": "Tyro", 
+    "01239_Animalia_Arthropoda_Insecta_Lepidoptera_Geometridae_Idaea_seriata": "Eris", 
+    "01240_Animalia_Arthropoda_Insecta_Lepidoptera_Geometridae_Idaea_tacturata": "Ajax",
+  }
+  choice_aliases_random_shuffle: true
+  choice_url_suffix: "_text_icon.png"
+  query_string: "Which category is most similar to the image?"
+  feedback_correct_url: "https://miljspsych.s3.amazonaws.com/resources/assets/images/feedback_is_correct_image.png"
+  feedback_incorrect_url: "https://miljspsych.s3.amazonaws.com/resources/assets/images/feedback_is_incorrect_image.png"
+
+hit_config:
+  title: "Challenge: learn to tell apart similar-looking moth species"
+  description: "View 180 photos and identify the moth in each photo. Learn by trial and error, and earn a bonus of $5.00 if you acheive more than 75% accuracy on the test phase (or $10 above 85%, or $20 above 95%). Your participation will contribute towards finding better ways of teaching medical trainees to diagnose diseases more accurately using medical images. PLEASE NOTE: it can be very hard to get high accuracy on this task, as the species appear very similar - please try your best and don't give up!"
+  reward: 3.50 # Estimated 14-minute completion time
+  num_respondents: 9
+  max_time_seconds: 2700  # 1800 = 30 mins, 2700 = 45 mins, 3600 = 1 hour
+  lifetime_seconds: 259200  # 259200 = 3 days, 86400 = 1 day
+  frame_height: 0  # The height of the task frame (if zero, resizes automatically)

@@ -1,0 +1,75 @@
+session_config:
+  - screening:
+    n_trials_per_class_train: 1
+    n_trials_per_class_val: 1
+    n_trials_per_class_test: 0
+    n_calibration_trials: 0
+    stimulus_duration_msec: 200
+    class_balanced: true
+    choice_image_bucket_name: "easy-imagenet-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: true
+    bonus_usd_if_correct: 0.00
+  - warmup:
+    show_test_instructions: true
+    n_trials_per_class_train: 1
+    n_trials_per_class_val: 1
+    n_trials_per_class_test: 0
+    n_calibration_trials: 0
+    class_balanced: true
+    choice_image_bucket_name: "easy-imagenet-media"
+    calibration_stimuli: ["circle", "triangle"]
+    shuffle_choice_order: false
+    rotate_choice_order: true
+  - main:
+    n_trials_per_class_train: 9
+    n_trials_per_class_val: 9
+    n_trials_per_class_test: 0
+    n_calibration_trials: 35
+    class_balanced: true
+    warmup_trial_type: "natural"
+    choice_image_bucket_name: "easy-imagenet-media"
+    calibration_stimuli: ["circle", "triangle"]
+    trial_types:
+      natural:
+        bucket: "morgan-imagenet16"
+        incorrect_duration_msec: 1000
+        bonus_usd_if_correct: 0.02
+      enhanced_logit:
+        bucket: "morgan-imagenet16-10-0dot5-20-logit"
+        incorrect_duration_msec: 1000
+        bonus_usd_if_correct: 0.02
+      enhanced_cross_entropy:
+        bucket: "morgan-imagenet16-10-0dot5-20-cross-entropy"
+        incorrect_duration_msec: 1000
+        bonus_usd_if_correct: 0.02
+    shuffle_choice_order: false
+    rotate_choice_order: true
+
+trial_config:
+  reward_duration_msec: 0
+  incorrect_duration_msec: 1000
+  stimulus_duration_msec: 17
+  calibration_stimulus_duration_msec: 200
+  post_stimulus_delay_duration_msec: 200
+  keep_stimulus_on: false
+  stimulus_width_degrees: 6
+  choice_width_degrees_default: 3
+  choice_duration_msec: 15000
+  pre_choice_lockout_delay_duration_msec: 200
+  intertrial_delay_duration_msec: 200
+  bonus_usd_if_correct: 0.02
+  choice_names_order: ["insect", "spider", "crab", "fish", "frog", "turtle", "snake", "lizard", "bird", "rodent", "monkey", "dog", "bear", "big cat", "house cat", "antelope"] # Set to null if no specific order
+  query_string: "Which category is most similar to the image?"
+  feedback_correct_url: "https://miljspsych.s3.amazonaws.com/resources/assets/images/feedback_is_correct_image.png"
+  feedback_incorrect_url: "https://miljspsych.s3.amazonaws.com/resources/assets/images/feedback_is_incorrect_image.png"
+
+hit_config:
+  title: "Identify objects in photos"
+  description: "View 352 photos and identify the animal or other object in each photo"
+  reward: 8.50
+  num_respondents: 9
+  max_time_seconds: 5400  # 1800 = 30 minutes, 3600 = 1 hour
+  lifetime_seconds: 259200  # 259200 = 3 days, 86400 = 1 day
+  frame_height: 0  # The height of the task frame (if zero, resizes automatically)
