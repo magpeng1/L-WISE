@@ -6,10 +6,6 @@ session_config:
     n_calibration_trials: 0
     stimulus_duration_msec: 200
     class_balanced: true
-    choice_image_bucket_name: "easy-imagenet-media"
-    calibration_stimuli: ["circle", "triangle"]
-    shuffle_choice_order: false
-    rotate_choice_order: true
     bonus_usd_if_correct: 0.00
   - warmup:
     show_test_instructions: true
@@ -18,10 +14,6 @@ session_config:
     n_trials_per_class_test: 0
     n_calibration_trials: 0
     class_balanced: true
-    choice_image_bucket_name: "easy-imagenet-media"
-    calibration_stimuli: ["circle", "triangle"]
-    shuffle_choice_order: false
-    rotate_choice_order: true
   - main:
     n_trials_per_class_train: 0
     n_trials_per_class_val: 14
@@ -29,8 +21,6 @@ session_config:
     n_calibration_trials: 30
     class_balanced: true
     warmup_trial_type: "natural"
-    choice_image_bucket_name: "easy-imagenet-media"
-    calibration_stimuli: ["circle", "triangle"]
     trial_types:
       natural:
         bucket: "morgan-imagenet16"
@@ -60,8 +50,6 @@ session_config:
         bucket: "morgan-imagenet16-xcit-augmented"
         incorrect_duration_msec: 1000
         bonus_usd_if_correct: 0.02
-    shuffle_choice_order: false
-    rotate_choice_order: true
 
 trial_config:
   reward_duration_msec: 0
@@ -80,6 +68,10 @@ trial_config:
   query_string: "Which category is most similar to the image?"
   feedback_correct_url: "https://miljspsych.s3.amazonaws.com/resources/assets/images/feedback_is_correct_image.png"
   feedback_incorrect_url: "https://miljspsych.s3.amazonaws.com/resources/assets/images/feedback_is_incorrect_image.png"
+  choice_image_bucket_name: "easy-imagenet-media"
+  calibration_stimuli: ["circle", "triangle"]
+  shuffle_choice_order: false
+  rotate_choice_order: true
 
 hit_config:
   title: "Identify animals in photos, earn roughly $4.00 bonus for accurate responses"

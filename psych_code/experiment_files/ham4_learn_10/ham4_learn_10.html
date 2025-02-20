@@ -2498,6 +2498,8 @@ function load_script(url) {
 
             user_ip = await getUserIP();
 
+            await load_script(bucket_url + "/aws_constants.js"); // session_metadata_api_url defined inside
+
             let trialset_id;
             if (platform == 'test') {
                 assignment_id_global = 'test_assignment'
@@ -2509,7 +2511,6 @@ function load_script(url) {
                 }
             }
             else {
-                await load_script(bucket_url + "/aws_constants.js"); // session_metadata_api_url defined inside
                 if (turkInfo.outsideTurk === false && turkInfo.previewMode === false) {
                     platform = 'mturk'
                 }

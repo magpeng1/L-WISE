@@ -1,4 +1,5 @@
 import os
+import sys
 import argparse
 import shutil
 import numpy as np
@@ -27,7 +28,7 @@ def main():
   parser.add_argument('--experiment_name', type=str, required=True, help='Experiment name')
   parser.add_argument('--experiment_number', type=int, required=True, help='Experiment number')
   parser.add_argument('--aws_prefix', type=str, help='Prefix for aws resources (e.g., to avoid confusion with other users)')
-  parser.add_argument('--num_trialsets', type=int, required=True, help='Number of trialset .js files to generate. Be generous - e.g. 5x the intended number of participants')
+  parser.add_argument('--num_trialsets', type=int, help='Number of trialset .js files to generate. Be generous - e.g. 3x the intended number of participants. Applicable only when using dataset_dirmap.csv (not trialsets.csv)')
   parser.add_argument('--delete_old_apis', action='store_true', help='Delete old API gateway APIs to avoid lots of duplicates (mostly for development purposes)')
   parser.add_argument('--fully_random_group_assignment', action='store_true', help='Each trialset has an independently randomly chosen condition group. Otherwise, groups are assigned with a blocked randomization design for balance purposes.')
   parser.add_argument('--num_conditions', type=int, default=None, help="Number of experimental conditions")
@@ -38,6 +39,9 @@ def main():
   parser.add_argument('--aws_config_only', action='store_true', help="Do nothing except updating the AWS configuration (no file changes)")
   parser.add_argument('--completion_code', type=str, default=None, help='completion code (e.g. for Prolific)')
   parser.add_argument('--screen_out_code', type=str, default=None, help='Screenout code (e.g. for Prolific)')
+  parser.add_argument('--prespecified_trialsets', action='store_true', help="Use pre-specified trialsets (defined in trialsets.csv) instead of dataset_dirmap.csv")
+  parser.add_argument('--data_spec_file_name', type=str, default=None, help="Specify a file name other than dataset_dirmap.csv or trialsets.csv, to specify either a dataset or a set of trialsets.")
+  parser.add_argument('--config_file_name', type=str, default="config.yaml", help="Specify the name of the config file to use.")
   args = parser.parse_args()
 
   # Random seed init
@@ -46,24 +50,30 @@ def main():
   # Assert that required files exist
   exp_id = f"{args.experiment_name}_{args.experiment_number}"
   exp_file = f"{exp_id}.html"
-  config_file = "config.yaml"
-  dataset_dirmap_file = "dataset_dirmap.csv"
+
+  if args.data_spec_file_name is not None:
+    data_spec_file = args.data_spec_file_name
+  elif args.prespecified_trialsets:
+    data_spec_file = "trialsets.csv"
+  else:
+    data_spec_file = "dataset_dirmap.csv"
+
   assert os.path.isfile(os.path.join("experiment_files", exp_id, exp_file)), \
     f"Main experiment file missing. Need: experiment_files/{exp_id}/{exp_file}"
-  assert os.path.isfile(os.path.join("experiment_files", exp_id, config_file)), \
-    f"Experiment config .yaml file missing. Need: experiment_files/{exp_id}/{config_file}"
-  assert os.path.isfile(os.path.join("experiment_files", exp_id, dataset_dirmap_file)), \
-    f"Dataset dirmap file missing. Need: experiment_files/{exp_id}/{dataset_dirmap_file}"
-
+  assert os.path.isfile(os.path.join("experiment_files", exp_id, args.config_file_name)), \
+    f"Experiment config .yaml file missing. Need: experiment_files/{exp_id}/{args.config_file_name}"
+  assert os.path.isfile(os.path.join("experiment_files", exp_id, data_spec_file)), \
+    f"Data spec file missing. Need: experiment_files/{exp_id}/{data_spec_file}"
 
   # Assert that conditions and block sizes are specified in a way that makes sense
-  assert args.fully_random_group_assignment or (args.num_conditions is not None and args.randomization_block_size is not None) or (args.num_conditions is not None and args.num_conditions == 1), \
-    "Must either (a) specify --num_conditions 1, or (b) either use fully random group assignment or specify both num_conditions and randomization_block_size"
-  if not args.fully_random_group_assignment and not args.num_conditions == 1:
-    assert args.randomization_block_size % args.num_conditions == 0, \
-      "Randomization block size must be a multiple of the number of conditions"
-    assert args.num_trialsets % args.randomization_block_size == 0, \
-      "Number of trialsets must be a multiple of the randomization block size"
+  if not args.prespecified_trialsets:
+    assert args.fully_random_group_assignment or (args.num_conditions is not None and args.randomization_block_size is not None) or (args.num_conditions is not None and args.num_conditions == 1), \
+      "Must either (a) specify --num_conditions 1, or (b) either use fully random group assignment or specify both num_conditions and randomization_block_size"
+    if not args.fully_random_group_assignment and not args.num_conditions == 1:
+      assert args.randomization_block_size % args.num_conditions == 0, \
+        "Randomization block size must be a multiple of the number of conditions"
+      assert args.num_trialsets % args.randomization_block_size == 0, \
+        "Number of trialsets must be a multiple of the randomization block size"
     
 
   # Make local directory for deployment of this experiment and copy local files
@@ -72,8 +82,10 @@ def main():
     os.makedirs(deploy_dir)
   if not args.aws_config_only:
     shutil.copy(os.path.join("experiment_files", exp_id, exp_file), deploy_dir)
-    shutil.copy(os.path.join("experiment_files", exp_id, config_file), deploy_dir)
-    shutil.copy(os.path.join("experiment_files", exp_id, dataset_dirmap_file), deploy_dir)
+    shutil.copy(os.path.join("experiment_files", exp_id, args.config_file_name), deploy_dir)
+    shutil.copy(os.path.join("experiment_files", exp_id, data_spec_file), deploy_dir)
+
+  sys.stdout = DualOutput(os.path.join("deployed_experiments", exp_id, "deployment.log"))
 
   if not args.local_only:
     # Create S3 bucket for this experiment and upload experiment files
@@ -88,8 +100,8 @@ def main():
       bucket_url = create_s3_bucket(bucket_name, allow_public_files=True)
     if not args.aws_config_only:
       upload_s3_file(bucket_name, os.path.join(deploy_dir, exp_file), acl="public-read")
-      upload_s3_file(bucket_name, os.path.join(deploy_dir, config_file))
-      upload_s3_file(bucket_name, os.path.join(deploy_dir, dataset_dirmap_file), acl="public-read")
+      upload_s3_file(bucket_name, os.path.join(deploy_dir, args.config_file_name))
+      upload_s3_file(bucket_name, os.path.join(deploy_dir, data_spec_file), acl="public-read")
 
   if not args.aws_config_only:
     # Generate and upload trialsets (js files that each define a sequence of stimuli for one participant session)
@@ -97,21 +109,29 @@ def main():
     if not os.path.exists(ts_dir):
       os.makedirs(ts_dir)
 
-    # Determine condition assignment for each trialset
-    if args.fully_random_group_assignment:
-      condition_indices = np.random.randint(0, args.num_conditions, size=args.num_trialsets)
+    if args.prespecified_trialsets:
+      generate_prespecified_trials(os.path.join(deploy_dir, args.config_file_name), os.path.join(deploy_dir, data_spec_file), ts_dir, args.experiment_name, args.experiment_number)
+      if not args.local_only:
+        for trialset_js_file in [f for f in os.listdir(ts_dir) if f.endswith('.js')]:
+          upload_s3_file(bucket_name, os.path.join(ts_dir, trialset_js_file), object_name=trialset_js_file, loc_in_bucket="trialsets", acl="public-read")
     else:
-      condition_indices = generate_balanced_blocks(args.num_conditions, args.num_trialsets, args.randomization_block_size, alternate=args.alternate_within_blocks)
+      # Determine condition assignment for each trialset
+      if args.fully_random_group_assignment:
+        condition_indices = np.random.randint(0, args.num_conditions, size=args.num_trialsets)
+      else:
+        condition_indices = generate_balanced_blocks(args.num_conditions, args.num_trialsets, args.randomization_block_size, alternate=args.alternate_within_blocks)
+      
+      condition_indices = [int(cond_idx_raw) for cond_idx_raw in condition_indices]
       print("TRIALSET CONDITION SEQUENCE:")
       print(condition_indices)
 
-    gen_trials_func = generate_trials
-    for ts_id, condition_idx in enumerate(condition_indices):
-      ts_file = f"{exp_id}_trials_{ts_id}.js"
-      gen_trials_func(os.path.join(deploy_dir, config_file), os.path.join(deploy_dir, dataset_dirmap_file), 
-                      os.path.join(ts_dir, ts_file), condition_idx=int(condition_idx))
-      if not args.local_only:
-        upload_s3_file(bucket_name, os.path.join(ts_dir, ts_file), object_name=ts_file, loc_in_bucket="trialsets", acl="public-read")
+      gen_trials_func = generate_trials
+      for ts_id, condition_idx in enumerate(condition_indices):
+        ts_file = f"{exp_id}_trials_{ts_id}.js"
+        gen_trials_func(os.path.join(deploy_dir, args.config_file_name), os.path.join(deploy_dir, data_spec_file), 
+                        os.path.join(ts_dir, ts_file), condition_idx=int(condition_idx))
+        if not args.local_only:
+          upload_s3_file(bucket_name, os.path.join(ts_dir, ts_file), object_name=ts_file, loc_in_bucket="trialsets", acl="public-read")
 
   if not args.local_only and not args.files_only:
     # Deploy lambda function for getting session metadata (broadly includes API, IAM role, and dynamodb tables for storing metadata)
@@ -146,14 +166,24 @@ def main():
     print("Uploaded aws_constants.js:", aws_constants)
 
   if not args.local_only:
+    print("--------------------------------")
     print(f"Experiment {exp_id} successfully deployed at: {os.path.join(bucket_url, exp_file)}")
+    print("--------------------------------")
     if not args.files_only:
-      print(f"URL to use for in-person experiments: {os.path.join(bucket_url, exp_file)}?PLATFORM=inperson&trialsubmit={session_metadata_api_url}&sessionsubmit={session_metadata_api_url}")
+      print(f"\nURL FOR IN-PERSON EXPERIMENTS:\n{os.path.join(bucket_url, exp_file)}?PLATFORM=inperson&trialsubmit={session_metadata_api_url}&sessionsubmit={session_metadata_api_url}")
       print(f"   (Note: you can change PLATFORM=inperson to PLATFORM=anythingyoulike, the platform will just be recorded as such in the data)")
-      print(f"URL to use on Prolific: {os.path.join(bucket_url, exp_file)}?PID={{{{%PROLIFIC_PID%}}}}&STUDY_ID={{{{%STUDY_ID%}}}}&SESSION_ID={{{{%SESSION_ID%}}}}&PLATFORM=prolific&trialsubmit={session_metadata_api_url}&sessionsubmit={session_metadata_api_url}")
-      print(f"URL to use on Mechanical Turk: {os.path.join(bucket_url, exp_file)}?PLATFORM=mturk&trialsubmit={session_metadata_api_url}&sessionsubmit={session_metadata_api_url}")
-      print(f"URL to test experiment interface in browser: {os.path.join(bucket_url, exp_file)}?TRIALSET_ID=0&trialsubmit={session_metadata_api_url}&sessionsubmit={session_metadata_api_url}&PLATFORM=test")
+      
+      print(f"\nURL FOR PROLIFIC:\n{os.path.join(bucket_url, exp_file)}?PID={{{{%PROLIFIC_PID%}}}}&STUDY_ID={{{{%STUDY_ID%}}}}&SESSION_ID={{{{%SESSION_ID%}}}}&PLATFORM=prolific&trialsubmit={session_metadata_api_url}&sessionsubmit={session_metadata_api_url}")
+      
+      print(f"\nURL FOR MECHANICAL TURK:\n{os.path.join(bucket_url, exp_file)}?PLATFORM=mturk&trialsubmit={session_metadata_api_url}&sessionsubmit={session_metadata_api_url}")
+      
+      print("\nPlease note: if you are having trouble with the experiment lagging/running slowly, try eliminating trial-by-trial data logging. For example, you can use the following URL for Prolific instead of the one above: ")
+      print(f"{os.path.join(bucket_url, exp_file)}?PID={{{{%PROLIFIC_PID%}}}}&STUDY_ID={{{{%STUDY_ID%}}}}&SESSION_ID={{{{%SESSION_ID%}}}}&PLATFORM=prolific&sessionsubmit={session_metadata_api_url}")
+    
+      print(f"\nURL TO TEST EXPERIMENT INTERFACE IN BROWSER:\n{os.path.join(bucket_url, exp_file)}?TRIALSET_ID=0&trialsubmit={session_metadata_api_url}&sessionsubmit={session_metadata_api_url}&PLATFORM=test")
       print("    (To test with a different trialset_id (e.g., trialset 42), replace TRIALSET_ID=0 with TRIALSET_ID=42 in the URL above)")
+      
+      print(f"\nAll of the above console output is saved in {os.path.join("deployed_experiments", exp_id, "deployment.log")}")
   else:
     print("Experiment files successfully generated")
 

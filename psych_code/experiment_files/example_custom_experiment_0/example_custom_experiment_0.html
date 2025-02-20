@@ -15,23 +15,18 @@
     <script>
         // ################### DEFINE EXPERIMENT IDENTIFIERS HERE ###################
         // Important: for automated aws setup, the name of this html file should be {experiment_name}_{experiment_number}.html
-        const experiment_name = "imagenet_animals_main";
-        const experiment_number = 10;
+        const experiment_name = "example_custom_experiment";
+        const experiment_number = 0;
         const aws_prefix = "morgan"; // Prefix for AWS service names on a shared account. Can be empty string "" if you don't want a prefix
-        const accuracy_based_screening = true;
-        const min_correct_total_for_auto_qual = 24;
-        const min_correct_per_class_for_auto_qual = 1;
-        let sco = false
-        let user_ip = null; // Will be set after getting the user's IP address
+        const num_test_trials = 40;
+        let condition_idx = null; // Will be set after trials are loaded
+        let user_ip = null; 
         let user_email = null;
-        const mturk_done_qualification_type_id = null
-        const mturk_success_qualification_type_id = null
-        const prolific_done_group_id = null
-        const prolific_success_group_id = null
-        const SANDBOX = false
-        const ASSIGN_QUALS_LAMBDA_API_GATEWAY_URL = "https://zdmhgtejk4.execute-api.us-east-1.amazonaws.com/prod/assign_quals"
-        const MIN_WIDTH = 600
-        const MIN_HEIGHT = 600
+        const done_qualification_type_id = "3J1BANAN65L5FWD9QSUPU4J5WJ2EZA"; //CHANGE TO PROD
+        const SANDBOX = false; //@@@@@@@@@@@@ CHANGE THIS @@@@@@@@@@@@@@@@@@@@@@ CHANGE THIS @@@@@@@@@@@@@@@ CHANGE THIS @@@@@@@@@@@@@@@
+        const ASSIGN_QUALS_LAMBDA_API_GATEWAY_URL = "https://zdmhgtejk4.execute-api.us-east-1.amazonaws.com/prod/assign_quals";
+        const MIN_WIDTH = 600;
+        const MIN_HEIGHT = 600;
     </script>
 </body>
 
@@ -869,55 +864,8 @@ function get_browser_check_node(){
     };
 }
 
-function submit_data_to_lambda(request_purpose, was_screened_out = false) {
-    let data = jsPsych.data.get().json() //get_submission_data_function()
-    let datastring = JSON.stringify(data);
+function get_instructions_node(instructions_html_pages){
 
-    session_metadata_lambda(experiment_name, experiment_number, aws_prefix, session_metadata_api_url, platform, assignment_id_global, data, MTS_TASK_GLOBALS.BONUS_USD_EARNED, null, request_purpose, was_screened_out)
-        .then(response => {
-            if (response.redirectUrl) {
-
-                // Fallback message with link in case the participant is not redirected automatically
-                const container = document.createElement('div');
-                container.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; background-color: #f0f0f0; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);';
-                const message = document.createElement('p');
-                message.textContent = 'If you are not automatically redirected, please click the link below:';
-                container.appendChild(message);
-                const link = document.createElement('a');
-                link.href = response.redirectUrl.toString();
-                link.textContent = 'Continue to next page';
-                link.style.cssText = 'display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;';
-                container.appendChild(link);
-                document.body.appendChild(container);
-                
-                // Attempt redirect
-                redirect(response.redirectUrl);
-            } else {
-                console.log("No redirect URL provided");
-            }
-        })
-        .catch(error => {
-            console.error("Error when storing final session data:", error);
-        });
-
-    const turkInfo = jsPsych.turk.turkInfo();
-    if (turkInfo.outsideTurk === false) {
-        let dataobject = {
-            'datastring': datastring,
-            'workerId': turkInfo.workerId,
-            'assignmentId': turkInfo.assignmentId,
-            'trialset_id': trialset_id,
-            'bonus_usd': MTS_TASK_GLOBALS.BONUS_USD_EARNED,
-            'turkInfo': turkInfo,
-        }
-        jsPsych.turk.submitToTurk(dataobject);
-    } else if (platform == null) {
-        console.log(data)
-        jsPsych.data.displayData('JSON');
-    }
-}
-
-function get_instructions_node(instructions_html_pages, check_for_screen_out=false){
 
     function wrap_instructions_html(
         instructions_string_html,
@@ -950,70 +898,41 @@ function get_instructions_node(instructions_html_pages, check_for_screen_out=fal
         return div.outerHTML;
     }
 
-    function createTrialSequence(pages) {
-        let trial_seq = [];
-        for (let i_page = 0; i_page < pages.length; i_page++) {
-            let html_cur = wrap_instructions_html(
-                pages[i_page],
-            );
+    let trial_seq = [];
+    for (let i_page = 0; i_page < instructions_html_pages.length; i_page++) {
+        let html_cur = wrap_instructions_html(
+            instructions_html_pages[i_page],
+        );
 
-            let button_text;
-            if (i_page < pages.length - 1) {
-                button_text = `Next (${i_page + 1}/${pages.length})`;
-            }
-            else{
-                button_text = 'Continue';
-            }
-            let cur_trial = {
-                    type: jsPsychHtmlButtonResponse,
-                    stimulus: html_cur,
-                    choices: function () {
-                        if (jsPsych.turk.turkInfo().previewMode === true)
-                            return ['In preview mode. Accept HIT to continue.']
-                        else
-                            return [button_text]
-                    },
-                }
-            trial_seq.push(cur_trial);
+        let button_text;
+        if (i_page < instructions_html_pages.length - 1) {
+            button_text = `Next (${i_page + 1}/${instructions_html_pages.length})`;
         }
-        return trial_seq;
-    }
-
-    function create_instructions_timeline(default_instructions) {
-        if (check_for_screen_out) {
-
-            let has_correct_total = MTS_TASK_GLOBALS.CORRECT_TRIALS_COUNT >= min_correct_total_for_auto_qual;
-            let has_min_correct_per_class = Object.values(MTS_TASK_GLOBALS.CORRECT_CLASS_COUNTS).every(count => count >= min_correct_per_class_for_auto_qual);
-
-            console.log("Correct count: " + MTS_TASK_GLOBALS.CORRECT_TRIALS_COUNT.toString())
-            console.log(MTS_TASK_GLOBALS.CORRECT_CLASS_COUNTS)
-
-
-            let passed_screening = has_correct_total && has_min_correct_per_class;
-
-            if (accuracy_based_screening && !passed_screening) {
-                sco = true //Screen out participant. This is a global variable
-                return createTrialSequence([session_settings['screening_out_instructions_html']]);
-            }
+        else{
+            button_text = 'Continue';
         }
-        return createTrialSequence(default_instructions);
+        let cur_trial = {
+                type: jsPsychHtmlButtonResponse,
+                stimulus: html_cur,
+                choices: function () {
+                    if (jsPsych.turk.turkInfo().previewMode === true)
+                        return ['In preview mode. Accept HIT to continue.']
+                    else
+                        return [button_text]
+                },
+            }
+        trial_seq.push(cur_trial);
     }
 
     let instructions_timeline = {
-        timeline: createTrialSequence(instructions_html_pages),
-        on_timeline_start: function() {
-            let new_timeline = create_instructions_timeline(instructions_html_pages)
-            this.timeline[0].trial_parameters.stimulus = new_timeline[0].stimulus
-        },
-        on_finish: function() {
-            if (accuracy_based_screening && sco) {
-                submit_data_to_lambda("store_session_data_screen_out", was_screened_out=true)
-                jsPsych.endExperiment('The study has concluded. Thank you for your participation.');
-            }
-        },
+        timeline: trial_seq,
         loop_function: function (data) {
-            return jsPsych.turk.turkInfo().previewMode;
-        },
+            if (jsPsych.turk.turkInfo().previewMode === true) {
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 
     return instructions_timeline;
@@ -1052,6 +971,19 @@ function get_turk_submission_node(trialset_id) {  //(get_submission_data_functio
         choices: ['Submit'],
         trial_duration: 0, // Optional: wait some number of seconds before autosubmitting
         on_finish: function () {
+            const turkInfo = jsPsych.turk.turkInfo();
+            let data = jsPsych.data.get().json() //get_submission_data_function()
+            let datastring = JSON.stringify(data);
+            // console.log(datastring)
+            let dataobject = {
+                'datastring': datastring,
+                'workerId': turkInfo.workerId,
+                'assignmentId': turkInfo.assignmentId,
+                'trialset_id': trialset_id,
+                'bonus_usd': MTS_TASK_GLOBALS.BONUS_USD_EARNED,
+                'turkInfo': turkInfo,
+            }
+            jsPsych.turk.submitToTurk(dataobject);
 
             // Check if the user entered their email
             try {
@@ -1073,7 +1005,37 @@ function get_turk_submission_node(trialset_id) {  //(get_submission_data_functio
                 console.warn("Error occurred while checking for email:", error);
             }
 
-            submit_data_to_lambda("store_session_data");
+            session_metadata_lambda(experiment_name, experiment_number, aws_prefix, session_metadata_api_url, platform, assignment_id_global, data, MTS_TASK_GLOBALS.BONUS_USD_EARNED, null, "store_session_data")
+                .then(response => {
+                    if (response.redirectUrl) {
+
+                        // Fallback message with link in case the participant is not redirected automatically
+                        const container = document.createElement('div');
+                        container.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; background-color: #f0f0f0; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1);';
+                        const message = document.createElement('p');
+                        message.textContent = 'If you are not automatically redirected, please click the link below:';
+                        container.appendChild(message);
+                        const link = document.createElement('a');
+                        link.href = response.redirectUrl.toString();
+                        link.textContent = 'Continue to next page';
+                        link.style.cssText = 'display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;';
+                        container.appendChild(link);
+                        document.body.appendChild(container);
+                        
+                        // Attempt redirect
+                        redirect(response.redirectUrl);
+                    } else {
+                        console.log("No redirect URL provided");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error when storing final session data:", error);
+                });
+
+            if (turkInfo.outsideTurk === true && platform == null) {
+                console.log(data)
+                jsPsych.data.displayData('JSON');
+            }
         },
     };
 }
@@ -1223,6 +1185,7 @@ function get_mouse_listener(
 </script>
 
 <script>
+<!-- common_javascript/milutils/canvas_text.js -->
 function renderCenteredWrappedText(context, text, x, y, max_width_px, max_characters_per_line, lineHeight, font, color) {
   font = font || "Arial";
   context.fillStyle = color || "black";
@@ -1262,6 +1225,7 @@ function renderCenteredWrappedText(context, text, x, y, max_width_px, max_charac
     context.fillText(lines[i], x, startingY + i * lineHeight);
   }
 }
+
 </script>
 
 
@@ -1299,9 +1263,6 @@ function renderCenteredWrappedText(context, text, x, y, max_width_px, max_charac
         this.BONUS_USD_EARNED = 0;
         this.TRIALS_COMPLETED = 0;
         this.NTRIALS = 0;
-
-        this.CORRECT_TRIALS_COUNT = 0;
-        this.CORRECT_CLASS_COUNTS = {};
     }
 
     _get_size() {
@@ -1372,6 +1333,29 @@ class MTS_Trial_Nodes {
         );
         let stimulus_choice_node = MTS_Trial_Nodes.get_nway_stimulus_choice_node();
         let feedback_node = MTS_Trial_Nodes.get_feedback_node();
+
+        let conditional_fixation_node = {
+            timeline: [fixation_node, blank_screen],
+            conditional_function: function() {
+                let show_fixation = jsPsych.timelineVariable('show_fixation');
+                if (show_fixation === undefined) {
+                    show_fixation = false; //Default false unless overrided (for backwards-compatibility)
+                }
+                return show_fixation
+            }
+        }
+
+        let conditional_feedback_node = {
+            timeline: [blank_screen, feedback_node],
+            conditional_function: function() {
+                let show_feedback = jsPsych.timelineVariable('show_feedback');
+                if (show_feedback === undefined) {
+                    show_feedback = true; //Default true unless overrided (for backwards-compatibility)
+                }
+                return show_feedback
+            }
+        }
+
         let intertrial_node = MTS_Trial_Nodes.get_intertrial_node();
 
         let window_size_check_node = {
@@ -1384,13 +1368,11 @@ class MTS_Trial_Nodes {
         }
 
         let timeline = [
-            fixation_node,
-            blank_screen,
+            conditional_fixation_node,
             stimulus_choice_node,
-            blank_screen,
-            feedback_node,
-            window_size_check_node,
+            conditional_feedback_node,
             intertrial_node,
+            window_size_check_node,
         ]
         return timeline
     }
@@ -1412,13 +1394,10 @@ class MTS_Trial_Nodes {
             canvas_height: canvas_height_px,
             canvas_offsetX: 0,
             canvas_offsetY: 0,
-            clear_canvas: true, 
+            clear_canvas: true,
             remain_canvas: false, // If true, the canvas is not cleared at the end of the trial.
             show_start_time: 0, // from the trial start (ms)
             show_end_time: undefined, // from the trial start (ms)
-            on_finish: function () {
-                jsPsych.getCurrentTrial().funcs.dispose();
-            },
         }
         return blank_screen;
     }
@@ -1443,27 +1422,43 @@ class MTS_Trial_Nodes {
 
         let get_feedback_duration_msec = function () {
             let reinforcement = get_reinforcement();
-
             if (reinforcement > 0) {
-                //console.log('Positive reinforcement delivery:', jsPsych.timelineVariable('reward_duration_msec'), 'ms')
                 return jsPsych.timelineVariable('reward_duration_msec');
             } else if (reinforcement < 0) {
-                //console.log('Negative reinforcement delivery:', jsPsych.timelineVariable('incorrect_duration_msec'), 'ms')
                 return jsPsych.timelineVariable('incorrect_duration_msec');
             } else {
-                //console.log('No reinforcement delivery (', 0, 'ms)')
+                return 0;
+            }
+        }
+
+        let get_feedback_lockout_duration_msec = function () {
+            let reinforcement = get_reinforcement();
+            if (reinforcement > 0) {
+                return jsPsych.timelineVariable('correct_feedback_lockout_duration_msec');
+            } else if (reinforcement < 0) {
+                return jsPsych.timelineVariable('incorrect_feedback_lockout_duration_msec');
+            } else {
                 return 0;
             }
         }
 
         let get_feedback_stimulus = function () {
+
             let positive_feedback_object;
             let negative_feedback_object;
 
             let feedback_correct_url = jsPsych.timelineVariable('feedback_correct_url', true);
             let feedback_incorrect_url = jsPsych.timelineVariable('feedback_incorrect_url', true);
+
+            let canvas_width = MTS_TASK_GLOBALS.get_canvas_width_pixels();
+            let canvas_height = MTS_TASK_GLOBALS.get_canvas_height_pixels();
+
+            let min_canvas_dim = Math.min(canvas_width, canvas_height);
+
             let get_feedback_size = function () {
-                return MTS_TASK_GLOBALS.stimulus_degrees_to_pixels(6)
+                //return MTS_TASK_GLOBALS.stimulus_degrees_to_pixels(jsPsych.timelineVariable('stimulus_width_degrees', true))/3;
+                let stimulus_width_px = Math.min(MTS_TASK_GLOBALS.stimulus_degrees_to_pixels(jsPsych.timelineVariable('stimulus_width_degrees', true)), 0.7*min_canvas_dim);
+                return parseInt(0.9*(min_canvas_dim - stimulus_width_px)/2)
             }
 
             if (feedback_correct_url !== undefined) {
@@ -1527,28 +1522,86 @@ class MTS_Trial_Nodes {
                 show_start_time: 0 // from the trial start (ms)
             }
 
+            let feedback_objects = [];
+
+            // Original stimulus image
+            let stimulus_image_url = jsPsych.timelineVariable('stimulus_image_url', true);
+            let stimulus_width_px = Math.min(MTS_TASK_GLOBALS.stimulus_degrees_to_pixels(jsPsych.timelineVariable('stimulus_width_degrees', true)), 0.7*min_canvas_dim);
+            let stimulus_height_px = stimulus_width_px // TODO need to implement properly for non-square images
+            let stimulus_object = {
+                obj_type: 'image',
+                startX: 'center',
+                startY: 'center', // Adjust this to leave room for feedback and text below
+                file: stimulus_image_url,
+                image_width: stimulus_width_px,
+            };
+            feedback_objects.push(stimulus_object);
+
+            // Determine reinforcement and accordingly set feedback and text
             let reinforcement = get_reinforcement();
+            let last_trial_data = jsPsych.data.get().last(2).values()[0];
+            let trial_outcome = last_trial_data['trial_outcome'];
+            let stimulus_name = trial_outcome['stimulus_name'];
+            let choice_name = trial_outcome['choice_name'];
 
-            // Return no stimulus objects if the duration is 0
-            let duration = get_feedback_duration_msec();
-
-            if (duration === 0) {
-                return []
+            let feedback_stimulus;
+            let feedback_text_line1;
+            let feedback_text_line2;
+            let feedback_text_color;
+            let feedback_text_font;
+            let min_feedback_duration;
+            if (reinforcement > 0) {
+                // Positive feedback
+                feedback_stimulus = positive_feedback_object; // Assuming positive_feedback_object is defined similarly to your original code
+                //feedback_text = `Correct!\nThe answer is: ${stimulus_name}`;
+                feedback_text_line1 = `Your answer: ${choice_name}`
+                feedback_text_line2 = stimulus_name // `Correct answer: ${stimulus_name}`
+                feedback_text_color = '#5df542'
+                feedback_text_font = "bold 24px Arial"
+                min_feedback_duration = jsPsych.timelineVariable('correct_feedback_lockout_duration_msec')
+            } else if (reinforcement < 0) {
+                // Negative feedback
+                feedback_stimulus = negative_feedback_object; // Assuming negative_feedback_object is defined similarly to your original code
+                //feedback_text = `Incorrect.\nThe answer is: ${stimulus_name}.\nYou answered: ${choice_name}`;
+                feedback_text_line1 = `Your answer:    ${choice_name}`
+                feedback_text_line2 = stimulus_name //`Correct answer: ${stimulus_name}`
+                feedback_text_color = '#ff4f4f'
+                feedback_text_font = "24px Arial"
+                min_feedback_duration = jsPsych.timelineVariable('incorrect_feedback_lockout_duration_msec')
             }
 
-            if (reinforcement === 1) {
-                return [positive_feedback_object];
-            } else if (reinforcement === -1) {
-                return [negative_feedback_object];
-            } else {
-                return [neutral_feedback_object];
-            }
+            feedback_stimulus.startY = (canvas_height/2 - stimulus_height_px/2)/2; 
+            feedback_objects.push(feedback_stimulus);
+
+            feedback_objects.push({
+                obj_type: 'text',
+                content: feedback_text_line2,
+                startX: 'center',
+                startY: (canvas_height/2 + stimulus_height_px/2) + parseInt(0.25*(canvas_height/2 - stimulus_height_px/2)),
+                text_color: 'white',
+                font: "bold 48px Arial",
+                text_space: 20,
+            });
+
+            // Instruction text ("Press spacebar to continue")
+            let instruction_text_object = {
+                obj_type: 'text',
+                content: "Press spacebar to continue",
+                startX: 'center',
+                startY: (canvas_height/2 + stimulus_height_px/2) + parseInt((0.75)*(canvas_height/2 - stimulus_height_px/2)),
+                text_color: 'white',
+                show_start_time: min_feedback_duration,
+                font: "24px Arial",
+                text_space: 20,
+            };
+            feedback_objects.push(instruction_text_object);
+
+            return feedback_objects;
         }
 
         let feedback_screen = {
             type: jsPsychPsychophysics,
             stimuli: get_feedback_stimulus,
-            trial_duration: get_feedback_duration_msec,
             background_color: function () {
                 return MTS_TASK_GLOBALS.BACKGROUND_COLOR
             },
@@ -1558,16 +1611,15 @@ class MTS_Trial_Nodes {
             canvas_height: function () {
                 return MTS_TASK_GLOBALS.get_canvas_height_pixels()
             },
+            response_type: 'key',
+            choices: [' '],
+            response_start_time: get_feedback_lockout_duration_msec,
+            trial_duration: get_feedback_duration_msec,
             canvas_offsetX: 0,
             canvas_offsetY: 0,
-            clear_canvas: true, 
+            clear_canvas: true,
             remain_canvas: false, // If true, the canvas is not cleared at the end of the trial.
             on_finish: function (data) {
-                let ntrials = MTS_TASK_GLOBALS.NTRIALS;
-                // Increment progressbar
-                let cur_progress_bar_value = jsPsych.getProgressBarCompleted();
-                jsPsych.setProgressBar(cur_progress_bar_value + (1 / ntrials));
-
                 jsPsych.getCurrentTrial().funcs.dispose();
             }
         }
@@ -1653,12 +1705,9 @@ class MTS_Trial_Nodes {
             canvas_height: function () {
                 return MTS_TASK_GLOBALS.get_canvas_height_pixels();
             },
-            on_finish: function () {
-                jsPsych.getCurrentTrial().funcs.dispose();
-            },
             canvas_offsetX: 0,
             canvas_offsetY: 0,
-            clear_canvas: true, 
+            clear_canvas: true,
             remain_canvas: false, // If true, the canvas is not cleared at the end of the trial.
         }
     }
@@ -1685,7 +1734,7 @@ class MTS_Trial_Nodes {
 
             let show_end_time;
             if (leave_stimulus_on === true) {
-                show_end_time = undefined
+                show_end_time = null
             } else {
                 show_end_time = stimulus_duration_msec
             }
@@ -1697,7 +1746,7 @@ class MTS_Trial_Nodes {
                 file: stimulus_image_url,
                 image_width: image_width_px,
                 show_start_time: 0,
-                show_end_time: show_end_time
+                show_end_time: show_end_time,
             };
 
             return stimulus_object;
@@ -1745,6 +1794,10 @@ class MTS_Trial_Nodes {
             if (is_even === false) {
                 theta_0 = Math.PI / 2; // Set the first choice to be theta = -90
             }
+            else if (nway === 2) {
+                theta_0 = Math.PI
+            }
+            // let theta_0 = 2*Math.PI*Math.random() // This version creates a random (not necessarily symmetric) rotation of the ring.
 
             let theta_seq = []
             for (let i = 0; i < nway; i++) {
@@ -1810,7 +1863,8 @@ class MTS_Trial_Nodes {
             let query_string = jsPsych.timelineVariable('query_string');
             let canvas_width_px = MTS_TASK_GLOBALS.get_canvas_width_pixels();
             let canvas_height_px = MTS_TASK_GLOBALS.get_canvas_height_pixels();
-            stimulus_width_px = MTS_TASK_GLOBALS.stimulus_degrees_to_pixels(jsPsych.timelineVariable('stimulus_width_degrees', true));
+            let min_canvas_dim = Math.min(MTS_TASK_GLOBALS.get_canvas_width_pixels(), MTS_TASK_GLOBALS.get_canvas_height_pixels());
+            stimulus_width_px = Math.min(MTS_TASK_GLOBALS.stimulus_degrees_to_pixels(jsPsych.timelineVariable('stimulus_width_degrees', true)), 0.7*min_canvas_dim);
             choice_width_px_default = MTS_TASK_GLOBALS.stimulus_degrees_to_pixels(jsPsych.timelineVariable('choice_width_degrees_default', true));
             let stimulus_image_url = jsPsych.timelineVariable('stimulus_image_url');
             let leave_stimulus_on = jsPsych.timelineVariable('keep_stimulus_on');
@@ -1818,7 +1872,6 @@ class MTS_Trial_Nodes {
             let choice_image_urls = jsPsych.timelineVariable('choice_image_urls');
             let stimulus_duration_msec = jsPsych.timelineVariable('stimulus_duration_msec');
             let post_stimulus_delay_msec = jsPsych.timelineVariable('post_stimulus_delay_duration_msec');
-
 
             // Get stimulus object
             let stimulus_object = get_stimulus_object(
@@ -1844,17 +1897,13 @@ class MTS_Trial_Nodes {
             }
 
             // Get choice objects
-            let min_canvas_dim = Math.min(MTS_TASK_GLOBALS.get_canvas_width_pixels(), MTS_TASK_GLOBALS.get_canvas_height_pixels());
-            let choice_radius_px = parseInt((min_canvas_dim - 1.05*choice_width_px_default)/2);
+            //let choice_radius_px = parseInt((min_canvas_dim - 1.05*choice_width_px_default)/2.5);
+            let choice_radius_px = parseInt(stimulus_width_px/2 + (min_canvas_dim/2 - stimulus_width_px/2)/2)
             let n_choices = choice_image_urls.length
-            choice_width_px = parseInt(Math.sin(Math.PI/n_choices)*2*choice_radius_px)
+            //choice_width_px = parseInt(Math.sin(Math.PI/n_choices)*2*choice_radius_px)
+            choice_width_px = parseInt(Math.min(Math.sin(Math.PI/n_choices)*2*choice_radius_px, 0.9*(min_canvas_dim - stimulus_width_px)/2))
             if (choice_width_px > choice_width_px_default) {
                 choice_width_px = choice_width_px_default
-            }
-            let min_choice_width_px = parseInt(min_canvas_dim / 10.0)
-            if (choice_width_px < min_choice_width_px) {
-                choice_width_px = min_choice_width_px;
-                choice_radius_px = parseInt((min_canvas_dim - 1.05*choice_width_px)/2); // Reset radius of big circle to match
             }
             let choice_onset_msec = post_stimulus_delay_msec + stimulus_duration_msec;
             let choice_objects = get_choice_stimuli(
@@ -1890,7 +1939,7 @@ class MTS_Trial_Nodes {
             )
 
             // Assemble all objects
-            let stim_array = choice_objects.concat([stimulus_object, stimulus_canary_object, choice_canary_object, prompt_object])
+            let stim_array = choice_objects.concat([stimulus_object, stimulus_canary_object, choice_canary_object])
             return stim_array
         }
 
@@ -1943,15 +1992,37 @@ class MTS_Trial_Nodes {
             on_valid_response,
         )
 
-
         let screen_node = {
             type: jsPsychPsychophysics,
             stimuli: assemble_stimuli,
             background_color: function () {
                 return MTS_TASK_GLOBALS.BACKGROUND_COLOR
             },
-            response_type: 'mouse',
-            response_ends_trial: false,
+            response_type: function() {
+                console.log("keypress_fj_response:")
+                console.log(jsPsych.timelineVariable('keypress_fj_response'))
+                if (jsPsych.timelineVariable('keypress_fj_response')){
+                    return 'key'
+                } else {
+                    return 'mouse'
+                }
+            },
+            response_ends_trial: function() {
+                if (jsPsych.timelineVariable('keypress_fj_response')){
+                    return true
+                } else {
+                    return false
+                }
+            },
+            mouse_down_func: null,
+            choices: function() {
+                if (jsPsych.timelineVariable('keypress_fj_response')){
+                    return ['f', 'j']
+                } else {
+                    return undefined
+                }
+            },
+            response_start_time: jsPsych.timelineVariable('pre_choice_lockout_delay_duration_msec'),
             trial_duration: function () {
                 let stimulus_duration_msec = jsPsych.timelineVariable('stimulus_duration_msec');
                 let post_stimulus_delay_msec = jsPsych.timelineVariable('post_stimulus_delay_duration_msec');
@@ -1972,8 +2043,11 @@ class MTS_Trial_Nodes {
             remain_canvas: false,
             show_start_time: 0,
             show_end_time: undefined,
-            mouse_down_func: choice_clicked_func,
             on_start: function (trial) {
+                if (!jsPsych.timelineVariable('keypress_fj_response')) {
+                    trial.mouse_down_func = choice_clicked_func;
+                }
+
                 let stimulus_duration_msec = jsPsych.timelineVariable('stimulus_duration_msec', true);
                 let post_stimulus_delay_msec = jsPsych.timelineVariable('post_stimulus_delay_duration_msec');
                 let pre_choice_lockout_delay_duration_msec = jsPsych.timelineVariable('pre_choice_lockout_delay_duration_msec');
@@ -1987,6 +2061,13 @@ class MTS_Trial_Nodes {
                 );
             },
             on_finish: function (data) {
+                let rel_timestamp_response = performance.now()
+                let reaction_time_msec = rel_timestamp_response - t0_choices_drawn;
+
+                // Increment progressbar
+                let cur_progress_bar_value = jsPsych.getProgressBarCompleted();
+                jsPsych.setProgressBar(cur_progress_bar_value + (1 / MTS_TASK_GLOBALS.NTRIALS));
+
                 // Log processed data
                 stimulus_drawn = false;
                 choices_drawn = false;
@@ -1995,31 +2076,42 @@ class MTS_Trial_Nodes {
                 let no_correct_choice_exists = i_correct_choice === null || typeof i_correct_choice === 'undefined';
                 let correct_choice_exists = !no_correct_choice_exists;
                 let gt;
-                if (correct_choice_exists === false) {
-                    gt = null;
-                    //console.log('No correct choice', i_correct_choice)
-                } else {
-                    if (!data['choices_made'] || i_correct_choice >= data['choices_made'].length) {
-                        console.log('choices_made is null, or undefined, or i_correct_choice is out of bounds.')
-                        gt = null
+                let i_choice;
+
+                let fj_response = jsPsych.timelineVariable('keypress_fj_response');
+
+                if (fj_response) { // For keyboard (f/j) responses
+                    i_choice = data['response'] === 'f' ? 0 : (data['response'] === 'j' ? 1 : data['response']);
+                    if (correct_choice_exists === false) {
+                        gt = null;
                     } else {
-                        gt = data['choices_made'][i_correct_choice] === true ? 1 : 0;
-                        //console.log('Correct: ', gt)
+                        gt = i_choice === i_correct_choice ? 1 : 0;
                     }
+                } else { // For mouse responses
+                    if (correct_choice_exists === false) {
+                        gt = null;
+                    } else {
+                        if (!data['choices_made'] || i_correct_choice >= data['choices_made'].length) {
+                            console.log('choices_made is null, or undefined, or i_correct_choice is out of bounds.')
+                            gt = null
+                        } else {
+                            gt = data['choices_made'][i_correct_choice] === true ? 1 : 0;
+                        }
+                    }
+                    i_choice = data['i_choice']
                 }
 
-                //
                 let trial_outcome = {}
                 let tstart = performance.timing.navigationStart;
                 let tstart_trial = data['time_elapsed'] // Round to the millisecond
                 trial_outcome['timestamp_start'] = (tstart + tstart_trial) / 1000 // Unix timestamp
                 trial_outcome['choices_made'] = data['choices_made']
-                // Get the index of the first positive choice
-                trial_outcome['i_choice'] = data['i_choice'];
+                trial_outcome['i_choice'] = i_choice
+                
                 trial_outcome['i_correct_choice'] = i_correct_choice;
-                trial_outcome['rel_timestamp_response'] = data['rel_timestamp_response']
+                trial_outcome['rel_timestamp_response'] = rel_timestamp_response
                 trial_outcome['perf'] = gt; // Needed for feedback screen
-                trial_outcome['reaction_time_msec'] = data['reaction_time_msec'];
+                trial_outcome['reaction_time_msec'] = reaction_time_msec;
 
                 delete data['choices_made']
                 delete data['rel_timestamp_response']
@@ -2027,6 +2119,7 @@ class MTS_Trial_Nodes {
                 delete data['i_choice']
 
                 trial_outcome['trial_type'] = jsPsych.timelineVariable('trial_type', true)
+
                 trial_outcome['block'] = jsPsych.timelineVariable('block', true)
                 trial_outcome['stimulus_image_url'] = jsPsych.timelineVariable('stimulus_image_url', true)
                 trial_outcome['class'] = jsPsych.timelineVariable('class', true)
@@ -2047,20 +2140,27 @@ class MTS_Trial_Nodes {
                 trial_outcome['stimulus_name'] = trial_outcome['choice_names'][trial_outcome['i_correct_choice']]  
                 trial_outcome['choice_name'] = trial_outcome['choice_names'][trial_outcome['i_choice']]
 
+                trial_outcome['condition_idx'] = jsPsych.timelineVariable('condition_idx', true)
+
+                // Set condition_idx (to be collected as metadata). 'Inconsistent' if more than one different value is provided. 
+                if (condition_idx === null) {
+                    condition_idx = trial_outcome['condition_idx']
+                    jsPsych.data.addProperties({'condition_idx': condition_idx})
+                } else if (condition_idx != trial_outcome['condition_idx']) {
+                    condition_idx = 'INCONSISTENT'
+                }
+
                 let bonus_usd_if_correct = jsPsych.timelineVariable('bonus_usd_if_correct', true) || 0;
                 trial_outcome['bonus_usd_if_correct'] = bonus_usd_if_correct;
 
                 data['trial_outcome'] = trial_outcome
                 // console.log('Trial outcome', trial_outcome)
                 MTS_TASK_GLOBALS.TRIALS_COMPLETED += 1;
-                if (MTS_TASK_GLOBALS.CORRECT_CLASS_COUNTS[trial_outcome['class']] === undefined) {
-                    MTS_TASK_GLOBALS.CORRECT_CLASS_COUNTS[trial_outcome['class']] = 0;
-                }
                 if (correct_choice_exists === true) {
                     if (gt === 1) {
-                        MTS_TASK_GLOBALS.CORRECT_TRIALS_COUNT += 1;
-                        MTS_TASK_GLOBALS.BONUS_USD_EARNED += bonus_usd_if_correct;
-                        MTS_TASK_GLOBALS.CORRECT_CLASS_COUNTS[trial_outcome['class']]++;
+                        if (trial_outcome['trial_type'] != "repeat_stimulus" && trial_outcome['trial_type'] != "calibration") {
+                            MTS_TASK_GLOBALS.BONUS_USD_EARNED += bonus_usd_if_correct;
+                        }
                     }
                 }
 
@@ -2092,7 +2192,7 @@ class MTS_Trial_Nodes {
 function get_nway_afc_trials(trial_sequence, session_settings) {
 
     MTS_TASK_GLOBALS.NTRIALS = trial_sequence.length;
-    let instructions_node = get_instructions_node([session_settings['instructions_html']])
+    let instructions_node = get_instructions_node(session_settings['instructions_html'])
 
     let mts_nodes = [];
     let image_urls_to_load = [];
@@ -2110,12 +2210,13 @@ function get_nway_afc_trials(trial_sequence, session_settings) {
     let show_test_instructions = false
 
     for (let i = 0; i < trial_sequence.length; i++) {
+
         let timeline_cur = MTS_Trial_Nodes.get_timeline();
         let timeline_variables_cur = trial_sequence[i];
 
         // If we're transitioning to the test block, show test instructions
         if (timeline_variables_cur['show_test_instructions'] && !show_test_instructions) {
-            let test_instructions_node = get_instructions_node([session_settings['warmup_complete_instructions_html']], check_for_screen_out=true)
+            let test_instructions_node = get_instructions_node([session_settings['test_instructions_html']])
             mts_nodes.push(test_instructions_node)
         }
         show_test_instructions = timeline_variables_cur['show_test_instructions']
@@ -2166,7 +2267,7 @@ function get_nway_afc_trials(trial_sequence, session_settings) {
         });
     }
 
-    if (jsPsych.turk.turkInfo().outsideTurk & platform !== "prolific") {
+    if (jsPsych.turk.turkInfo().outsideTurk) {
         preloadImagesAndIdentifyErrors(image_urls_to_load, (errors) => {
             if (errors.length > 0) {
                 console.log('Failed URLs:', errors);
@@ -2174,22 +2275,6 @@ function get_nway_afc_trials(trial_sequence, session_settings) {
                 console.log('All images loaded successfully.');
             }
         });
-    }
-
-    function cleanupImageCache() {
-        const imgCache = jsPsych.pluginAPI.img_cache;
-        for (let src in imgCache) {
-            if (imgCache.hasOwnProperty(src)) {
-                imgCache[src].onload = null;
-                imgCache[src].onerror = null;
-                imgCache[src].oncanplaythrough = null;
-                imgCache[src].onabort = null;
-            }
-        }
-
-        if (window.gc) {
-            window.gc();
-        }
     }
 
     let task_preload = {
@@ -2204,8 +2289,6 @@ function get_nway_afc_trials(trial_sequence, session_settings) {
         on_finish: function () {
             console.log('Done preloading MTS assets.')
             jsPsych.setProgressBar(0.005);
-            console.log("Clearing event listeners associated with preloading...")
-            cleanupImageCache();
         }
     }
 
@@ -2264,14 +2347,33 @@ function get_nway_afc_trials(trial_sequence, session_settings) {
         choices: ['Press to continue'],
         trial_duration: 10000,
         stimulus: function () {
-            let bonus_usd_earned = MTS_TASK_GLOBALS.BONUS_USD_EARNED
-
-            if (bonus_usd_earned > 0) {
-                return 'Thank you for your work! Bonus earned: $' + bonus_usd_earned.toFixed(2).toString();
-            } else {
-                return 'No bonus earned. Thank you for your work.'
+            const turkInfo = jsPsych.turk.turkInfo()
+            if (turkInfo.outsideTurk === false && turkInfo.previewMode === false) {
+                let qualification_type_ids = [done_qualification_type_id]
+                assign_quals_lambda_wrapper(qualification_type_ids, SANDBOX);
             }
+
+            let pt_accuracy = (MTS_TASK_GLOBALS.BONUS_USD_EARNED*100 / num_test_trials)*100 // For now, we add 0.01 to BONUS_USD_EARNED for each correct, qualifying trial
+
+            if (pt_accuracy < 75) {
+                MTS_TASK_GLOBALS.BONUS_USD_EARNED = 0
+                return 'Thank you for your work. Your accuracy was ' + (pt_accuracy).toFixed(0).toString() + '%. Because more than 75% was required for a bonus, you will not receive a bonus this time.'
+            } else if (pt_accuracy >= 75 && pt_accuracy < 85) {
+                MTS_TASK_GLOBALS.BONUS_USD_EARNED = 5.00
+            } else if (pt_accuracy >= 85 && pt_accuracy < 95) {
+                MTS_TASK_GLOBALS.BONUS_USD_EARNED = 10.00
+            } else if (pt_accuracy >= 95) {
+                MTS_TASK_GLOBALS.BONUS_USD_EARNED = 20.00
+            } else {
+                MTS_TASK_GLOBALS.BONUS_USD_EARNED = 0
+                return 'Thank you for your work. Your accuracy was ' + (pt_accuracy).toFixed(0).toString() + '%. There was an internal error in calculating the bonus: please write you accuracy down and contact the researcher.'
+            }
+
+            return 'Thank you for your work. Your accuracy was ' + (pt_accuracy).toFixed(0).toString() + '%. You earned a bonus of $' + (MTS_TASK_GLOBALS.BONUS_USD_EARNED).toString() + '!';
         },
+        on_finish: function(data) {
+            data.response = MTS_TASK_GLOBALS.BONUS_USD_EARNED;
+        }
     }
 
     timeline.push(finish_node)
@@ -2294,7 +2396,7 @@ async function getUserIP() {
     }
 }
 
-function session_metadata_lambda(experiment_name, experiment_number, aws_prefix, api_gateway_url, platform = null, assignment_id = null, datastring = null, bonus_usd = null, trialset_id = null, request_purpose = null, was_screened_out = false, max_retries = 3, initial_delay = 1000) {
+function session_metadata_lambda(experiment_name, experiment_number, aws_prefix, api_gateway_url, platform = null, assignment_id = null, datastring = null, bonus_usd = null, trialset_id = null, request_purpose = null, max_retries = 3, initial_delay = 1000) {
     const turkInfo = jsPsych.turk.turkInfo();
 
     function makeRequest(retryCount) {
@@ -2319,7 +2421,6 @@ function session_metadata_lambda(experiment_name, experiment_number, aws_prefix,
                 experiment_name: experiment_name,
                 experiment_number: experiment_number,
                 aws_prefix: aws_prefix,
-                was_screened_out: was_screened_out,
             };
 
             if (turkInfo.outsideTurk === false && turkInfo.previewMode === false) {
@@ -2353,6 +2454,9 @@ function session_metadata_lambda(experiment_name, experiment_number, aws_prefix,
             }
             if (trialset_id !== null) {
                 payload.trialset_id = trialset_id
+            }
+            if (condition_idx !== null) { // Note that this is a global variable defined near the top of the script
+                payload.condition_idx = condition_idx
             }
             if (user_ip != null) {
                 payload.user_ip = user_ip
@@ -2438,7 +2542,7 @@ function load_script(url) {
             let user_in_preview_mode = turkInfo.previewMode;
             
             bucket_url = 'https://' + `${aws_prefix}-${experiment_name.replace(/_/g, "-").toLowerCase()}-${experiment_number}` + '.s3.amazonaws.com';
-            
+
             user_ip = await getUserIP();
 
             await load_script(bucket_url + "/aws_constants.js"); // session_metadata_api_url defined inside
@@ -2507,12 +2611,15 @@ function load_script(url) {
     );
 
     let session_settings = {
-        "instructions_html": "\n            <ul>\n                <li>Thank you for your joining our study! This task involves making judgements about pictures. \n                <li>To start a trial, press the white \"+\" button at the center of the screen.\n                <li>Once the trial starts, a picture will be shown to you very briefly. Then, some choices will appear.</li>\n                <li><b>Your task</b> is to click the choice which best describes the first image.\n                <li>Making accurate choices will <text style=\"color:green; font-style:oblique\">increase your bonus payout</text>, but random guessing will lead to <text style=\"color:red; font-style:oblique\">no bonus</text> and to the task ending early.</li>\n     <li>Some trials may be extremely challenging. We cannot guarantee that it is possible to choose accurately in all cases.</li>\n                <li>We reserve the right to end the experiment at any time.</li>\n                <li>If you encounter a bug (e.g., the task freezing), please contact us and let us know. You will be compensated for your time.\n            <li>If you wish, you may view our full consent form document <a href=\"https://morgan-study-misc.s3.amazonaws.com/Consent_Form_19Nov2019.pdf\">here.</a></li>\n                <li>By clicking \"Continue,\" you voluntarily agree to be a participant in our experiment and agree to all of the rules above.</li>\n                </ul>",
-        "warmup_complete_instructions_html": "\n <ul>\n    <li>Warmup complete!</li>\n   <li>From now on, images will be shown much more briefly. Please try your best.</li>\n   </ul>",
-        "screening_out_instructions_html": "\n <ul>\n    <li> This study requires a certain level of task performance that wasn't met in the initial phase. Your effort is appreciated, and you will be compensated for <b>up to 10 minutes</b> of your time for the initial phase. </li>  <li> If you wish to <b>try again</b>, you may refresh the page now (keep in mind that your time limit will not reset) </li>  <li> To <b>conclude</b> your participation, press Continue.</li>   </ul>",
-        "calibrate_monitor": true,
-        "force_fullscreen": false
+    "instructions_html": [
+        "<ul> <li>Thank you for accepting this HIT!</li> <li>This task involves learning to distinguish four different species of moths that look very similar to each other.</li> <li> Your participation will help us find better ways to teach medical students to identify and diagnose diseases more accurately from images. </li> <li>Some trials may be very hard. We cannot guarantee that it is possible to choose accurately in all cases.</li> <li>We reserve the right to end the experiment at any time.</li> <li>If you encounter a bug (e.g., the task freezing), please contact us and let us know. You will be compensated for your time.</li> <li>If you wish, you may view our full consent form document <a href=\"https://morgan-study-misc.s3.amazonaws.com/Consent_Form_19Nov2019.pdf\">here.</a></li> <li>By clicking \"Continue\" on the next page, you voluntarily consent to be a participant in our experiment and agree to all of the rules above.</li> </ul>",
+        "<ul> <b>INSTRUCTIONS</b> <li>Click one of the round buttons to make a choice on each image.</li> <li> Please try your best to learn by trial and error.</li> <li>You must make each choice within <b>10 seconds</b></li> <li>After a training phase with feedback on each choice, there is a test phase with no feedback.</li> <li> <b> You will earn a <text style=\"color:green; font-style:oblique\">$5.00 bonus if your accuracy in the test phase is above 75%, or $10.00 if above 85%, or $20.00 if above 95%.</text> </b> </li> </ul>"
+    ],
+    "test_instructions_html": "\n <ul>\n    <li>Thank you for completing the training phase of the experiment!</li>\n       <li>Press \"Continue\" to begin the test phase.</li>\n  <li>During the test, you will <b>not</b> receive feedback, but <text style=\"color:green; font-style:oblique\">You will earn a $5.00 bonus if your accuracy is above 75%, or $10.00 above 85%, or $20.00 above 95%.</text></li>\n      </ul>",
+    "calibrate_monitor": false,
+    "force_fullscreen": false
     };
+
 
     let browser_check_node = get_browser_check_node();
 
@@ -2520,7 +2627,7 @@ function load_script(url) {
     let preview_gate = {
         timeline: [{
             type: jsPsychHtmlKeyboardResponse,
-            stimulus: '<h1 style="color:red">PREVIEW MODE</h1> Please accept the Study/HIT to continue.',
+            stimulus: '<h1 style="color:red">PREVIEW MODE</h1> Please accept the HIT to continue.',
             choices: [' '],
             on_start: function () {
                 console.log('At preview gate.')

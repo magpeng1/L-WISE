@@ -15,7 +15,7 @@ def make_trial_dict(entry, i_correct_choice, choice_image_urls, choice_names, tr
   trial_dict = {
     "trial_type": entry['trial_type'],
     "class": entry["class"] if "class" in entry else choice_names[i_correct_choice].replace(" ", "_"),
-    "split": entry['split'],
+    "split": entry['split'] if 'split' in entry else 'na',
     "i_correct_choice": i_correct_choice,
     "stimulus_image_url": entry['url'],
     **trial_config, # Unpacks everything in trial_config into the dictionary
@@ -50,8 +50,14 @@ def generate_trial(entry, block_config, trial_config, choice_image_urls, choice_
   # Override trial_config vars with block_config vars if there is overlap
   trial_config = copy.deepcopy(trial_config)
   trial_config['calibration'] = 0
-  if "block" in block_config:
-    trial_config["block"] = block_config["block"]
+
+  # Override these variables even if they don't already exist in trial_config:
+  block_vars_to_trials = ["block", "condition_idx"]
+  for bvar in block_vars_to_trials:
+    if bvar in block_config:
+      trial_config[bvar] = block_config[bvar]
+
+  # For all cases where a key exists in both trial_config and block_config, overwrite the trial_config one from block_config
   for key in block_config.keys():
     if key in trial_config or key in ["show_test_instructions"]:
       trial_config[key] = block_config[key]
@@ -85,14 +91,14 @@ def generate_calibration_trial(block_config, trial_config, choice_image_urls, ch
     if key in trial_config or key in ["show_test_instructions"]:
       trial_config[key] = block_config[key]
 
-  cstims = block_config["calibration_stimuli"]
+  cstims = trial_config["calibration_stimuli"]
 
   if cstim not in cstims:
     raise NotImplementedError(f'generate_calibration_trials is currently only implemented for the following entry in config.yaml: calibration_stimuli: {cstim}')
   assert len(cstims) == 2, f"generate_calibration_trial is only implemented for 2 different calibration stimuli. This list can only have 2 items: {cstims}"
 
-  if "choice_image_bucket_name" in block_config:
-    choice_image_bucket_name = block_config["choice_image_bucket_name"]
+  if "choice_image_bucket_name" in trial_config:
+    choice_image_bucket_name = trial_config["choice_image_bucket_name"]
   else:
     choice_image_bucket_name = "easy-imagenet-media" # TEMP: for backwards-compatibility with early experiments
 
@@ -302,11 +308,10 @@ def generate_trials(config_path, dirmap_path, output_js_path, write_csvs=True, c
       choice_name_aliases_partial = {}
     
     # Fill in any missing items in the dict (if it's empty, every class name just maps to itself - same for any classes that don't have aliases in the dict)
-    # choice_name_aliases = {cl.replace("_", " "): (choice_name_aliases_partial[cl.replace("_", " ")] if cl.replace("_", " ") in choice_name_aliases_partial else cl) for cl in classes}
-    # class_to_url_dict = {cl: f"https://{block_config['choice_image_bucket_name']}.s3.amazonaws.com/{choice_name_aliases[cl.replace('_', ' ')].replace(' ', '_')}{choice_url_suffix}" for cl in classes}
-
-    choice_name_aliases = {cl: (choice_name_aliases_partial[cl] if cl in choice_name_aliases_partial else cl) for cl in classes}
-    class_to_url_dict = {cl: f"https://{block_config['choice_image_bucket_name']}.s3.amazonaws.com/{choice_name_aliases[cl].replace(' ', '_')}{choice_url_suffix}" for cl in classes}
+    # Note: the default "choice name" is just the class name with any underscores replaced by spaces
+    all_choice_names = [cl.replace('_', ' ') for cl in classes]
+    choice_name_aliases = {ch: (choice_name_aliases_partial[ch] if ch in choice_name_aliases_partial else ch) for ch in all_choice_names}
+    class_to_url_dict = {cl: f"https://{trial_config['choice_image_bucket_name']}.s3.amazonaws.com/{choice_name_aliases[cl.replace('_', ' ')].replace(' ', '_')}{choice_url_suffix}" for cl in classes}
 
     # If n_classes_per_bucket is specified, we assign each class to different buckets accordingly. 
     if "n_classes_per_bucket" in block_config:
@@ -352,7 +357,7 @@ def generate_trials(config_path, dirmap_path, output_js_path, write_csvs=True, c
         repeat_trials.append(trial)
 
     # Generate calibration trials
-    calibration_stims = block_config["calibration_stimuli"] * (block_config["n_calibration_trials"] // len(block_config["calibration_stimuli"]))
+    calibration_stims = trial_config["calibration_stimuli"] * (block_config["n_calibration_trials"] // len(trial_config["calibration_stimuli"]))
     calibration_trials = []
     for stim in calibration_stims:
       choice_names, choice_urls = get_choice_names_and_urls(block_config, trial_config, class_to_url_dict)

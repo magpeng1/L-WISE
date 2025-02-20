@@ -12,7 +12,7 @@ def create_lambda_function(lambda_function_name, role_arn, env_vars=None):
     # Zip the Lambda function code
     zip_buffer = io.BytesIO()
     with zipfile.ZipFile(zip_buffer, 'a', zipfile.ZIP_DEFLATED, False) as zip_file:
-        zip_file.write('modules/session_metadata_lambda.py', 'session_metadata_lambda.py')
+        zip_file.write('lwise_psych_modules/session_metadata_lambda.py', 'session_metadata_lambda.py')
     zip_buffer.seek(0)
 
     # Check if the Lambda function already exists

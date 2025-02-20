@@ -181,6 +181,8 @@ python scripts/get_experiment_data.py --experiment_name idaea4_learn --experimen
 7. Copy the Prolific URL (provided by the deploy_experiment.py script) into the Prolific website. If everything went well, you are ready to recruit participants!
 8. Run get_experiment_data.py again to download data once a number of participants have completed the task. It is advisable to do this after a small number of participants have finished to make sure everything is working correctly. 
 
+**IMPORTANT NOTE**: By default, the experiments are set up to log data after each individual trial. This aims to conserve as much data as possible, but can also make the experiment run slowly (especially if there are lots of trials). To speed up the experiment, omit the "&trialsubmit=(url here)" part of the experiment url - it will then only save all the data at the end of the session. 
+
 ### How to deploy experiments to reproduce L-WISE paper results: 
 
 Deploying a different experiment using the steps above requires only varying the arguments passed to deploy_experiment.py. Below are example commands for deploying each of the experiments from the L-WISE paper. Note that --aws_prefix can be set to anything (e.g., your name) - it is just a way of keeping track of which resources are yours on a shared AWS account.
@@ -338,21 +340,23 @@ To download participant data for an experiment, use psych_code/scripts/get_exper
 
 ## Descriptions of experiment_files directories
 
-imagenet_animals_main_10: The main ImageNet animal recognition experiment, testing logit-max enhancement at different epsilon pixel budgets, with off-the-shelf enhancement algorithms as controls
+**imagenet_animals_main_10**: The main ImageNet animal recognition experiment, testing logit-max enhancement at different epsilon pixel budgets, with off-the-shelf enhancement algorithms as controls
 
-imagenet_animals_guide_models_10: Supplementary ImageNet animal recognition experiment (compare enhancements using several different guide models). Before deploying, copy dataset_dirmap.csv from imagenet_animals_main_10. 
+**imagenet_animals_guide_models_10**: Supplementary ImageNet animal recognition experiment (compare enhancements using several different guide models). Before deploying, copy dataset_dirmap.csv from imagenet_animals_main_10. 
 
-imagenet_animals_loss_ablation_10: Supplementary ImageNet animal recognition experiment (loss function ablation: test cross-entropy vs logit-max losses for train set and val set images). Before deploying, copy dataset_dirmap.csv from imagenet_animals_main_10. 
+**imagenet_animals_loss_ablation_10**: Supplementary ImageNet animal recognition experiment (loss function ablation: test cross-entropy vs logit-max losses for train set and val set images). Before deploying, copy dataset_dirmap.csv from imagenet_animals_main_10. 
 
-idaea4_learn_10: iNaturalist moth category learning experiment
+**idaea4_learn_10**: iNaturalist moth category learning experiment
 
-ham4_learn_10: Main HAM10000 dermoscopy category learning experiment
+**ham4_learn_10**: Main HAM10000 dermoscopy category learning experiment
 
-ham4_learn_pilot_0: Pilot HAM10000 dermoscopy image category learning experiment, unsuccessful at boosting learning because initial enhancement level was too strong at eps=16 (results presented in supplementary materials of L-WISE paper). Before deploying, copy dataset_dirmap.csv from ham4_learn_10.
+**ham4_learn_pilot_0**: Pilot HAM10000 dermoscopy image category learning experiment, unsuccessful at boosting learning because initial enhancement level was too strong at eps=16 (results presented in supplementary materials of L-WISE paper). Before deploying, copy dataset_dirmap.csv from ham4_learn_10.
 
-mhist_learn_10: MHIST Histology category learning experiment
+**mhist_learn_10**: MHIST Histology category learning experiment
 
-turtlequal_10: Qualifier task in which participants were asked to learn the difference between two different species of turtles (loggerhead and leatherback, images from ImageNet validation set)
+**turtlequal_10**: Qualifier task in which participants were asked to learn the difference between two different species of turtles (loggerhead and leatherback, images from ImageNet validation set)
+
+**example_custom_experiment_0**: Example of an experiment with a fully customized trial sequence. See "Implementing experiments with customized trial sequences" below. 
 
 
 ## Key steps when implementing a new experiment
@@ -363,4 +367,29 @@ turtlequal_10: Qualifier task in which participants were asked to learn the diff
 4. Edit config.yaml as desired. See section on configuration above. 
 
 For more extensive modifications to the behavior of the experiment, we suggest modifying the .html files directly. 
+
+## Implementing experiments with customized trial sequences
+
+The instructions above apply to experiments with a specific structure that has several constraints (e.g., balanced classes/trial types, dataset must be specified in a dataset_dirmap.csv with different versions of the same images stored with the same name in different S3 buckets, etc..)
+
+A more flexible way to implement your own experiment is to directly specify the sequence of stimuli to be shown, trial by trial, participant by participant, in a file called "trialsets.csv" inside your subdirectory of experiment_files. For an example of this, please see psych_code/experiment_files/example_custom_experiment_0. Here, trialsets.csv specifies two trialsets (sessions for two different participants, probably): the first session has 16 trials, and the second has 32 (not that you'd necessarily want two participants to see different numbers of trials - this is just to show that you can put whatever trials you want). Each session is specified by a unique integer value in the trialset_id column. You must also specify condition_idx, block, class, and url for each image. 
+
+**VERY IMPORTANT: You can add more columns to trialsets.csv as desired - these can be given the same names as any of the properties in the trial_config block inside the config.yaml file (the values in trialsets.csv will overwrite any defaults in the config.yaml file on a trial-by-trial basis).**
+
+Once you have set up your trialsets.csv, you can deploy the experiment as usual. Below are a few commands to deploy example experiments specified in this way.
+
+Binary turtle classification experiment (we show the fixation cross on every second trial, as a demonstration of how to override variables in the trial_config block in config.yaml: see experiment_files/example_custom_experiment_0/trialsets.csv):
+```
+python scripts/deploy_experiment.py --experiment_name example_custom_experiment --experiment_number 0 --aws_prefix lwise --prespecified_trialsets
+```
+
+Binary turtle classification experiment (where the participant presses F or J keys to make responses instead of using the mouse)
+```
+python scripts/deploy_experiment.py --experiment_name example_custom_experiment --experiment_number 0 --aws_prefix lwise --prespecified_trialsets --config_file_name config_FJ_keypress_response.yaml
+```
+
+16-way ImageNet animal classification experiment:
+```
+python scripts/deploy_experiment.py --experiment_name example_custom_experiment --experiment_number 0 --aws_prefix lwise --prespecified_trialsets --data_spec_file imagenet_trialsets.csv --config_file_name imagenet_config.yaml
+```
 

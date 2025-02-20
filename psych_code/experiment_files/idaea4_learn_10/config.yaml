@@ -6,10 +6,6 @@ session_config:
     n_calibration_trials: 2
     class_balanced: true
     n_repeats_of_one_stim: 0
-    choice_image_bucket_name: "morgan-fine-grained-media"
-    calibration_stimuli: ["circle", "triangle"]
-    shuffle_choice_order: false
-    rotate_choice_order: false
     show_feedback: true
     conditional_trial_types: [
       {"natural": {"bucket": "morgan-idaea4-natural"}},
@@ -27,10 +23,6 @@ session_config:
     n_calibration_trials: 2
     class_balanced: true
     n_repeats_of_one_stim: 1
-    choice_image_bucket_name: "morgan-fine-grained-media"
-    calibration_stimuli: ["circle", "triangle"]
-    shuffle_choice_order: false
-    rotate_choice_order: false
     show_feedback: true
     conditional_trial_types: [
       {"natural": {"bucket": "morgan-idaea4-natural"}},
@@ -48,10 +40,6 @@ session_config:
     n_calibration_trials: 2
     class_balanced: true
     n_repeats_of_one_stim: 1
-    choice_image_bucket_name: "morgan-fine-grained-media"
-    calibration_stimuli: ["circle", "triangle"]
-    shuffle_choice_order: false
-    rotate_choice_order: false
     show_feedback: true
     conditional_trial_types: [
       {"natural": {"bucket": "morgan-idaea4-natural"}},
@@ -69,10 +57,6 @@ session_config:
     n_calibration_trials: 2
     class_balanced: true
     n_repeats_of_one_stim: 1
-    choice_image_bucket_name: "morgan-fine-grained-media"
-    calibration_stimuli: ["circle", "triangle"]
-    shuffle_choice_order: false
-    rotate_choice_order: false
     show_feedback: true
     conditional_trial_types: [
       {"natural": {"bucket": "morgan-idaea4-natural"}},
@@ -90,10 +74,6 @@ session_config:
     n_calibration_trials: 2
     class_balanced: true
     n_repeats_of_one_stim: 1
-    choice_image_bucket_name: "morgan-fine-grained-media"
-    calibration_stimuli: ["circle", "triangle"]
-    shuffle_choice_order: false
-    rotate_choice_order: false
     show_feedback: true
     conditional_trial_types: [
       {"natural": {"bucket": "morgan-idaea4-natural"}},
@@ -111,10 +91,6 @@ session_config:
     n_calibration_trials: 2
     class_balanced: true
     n_repeats_of_one_stim: 1
-    choice_image_bucket_name: "morgan-fine-grained-media"
-    calibration_stimuli: ["circle", "triangle"]
-    shuffle_choice_order: false
-    rotate_choice_order: false
     show_feedback: true
     conditional_trial_types: [
       {"natural": {"bucket": "morgan-idaea4-natural"}},
@@ -132,10 +108,6 @@ session_config:
     n_calibration_trials: 2
     class_balanced: true
     n_repeats_of_one_stim: 1
-    choice_image_bucket_name: "morgan-fine-grained-media"
-    calibration_stimuli: ["circle", "triangle"]
-    shuffle_choice_order: false
-    rotate_choice_order: false
     show_feedback: true
     conditional_trial_types: [
       {"natural": {"bucket": "morgan-idaea4-natural"}},
@@ -153,10 +125,6 @@ session_config:
     n_calibration_trials: 2
     class_balanced: true
     n_repeats_of_one_stim: 1
-    choice_image_bucket_name: "morgan-fine-grained-media"
-    calibration_stimuli: ["circle", "triangle"]
-    shuffle_choice_order: false
-    rotate_choice_order: false
     show_feedback: true
     conditional_trial_types: [
       {"natural": {"bucket": "morgan-idaea4-natural"}},
@@ -176,10 +144,6 @@ session_config:
     n_calibration_trials: 2
     class_balanced: true
     n_repeats_of_one_stim: 3
-    choice_image_bucket_name: "morgan-fine-grained-media"
-    calibration_stimuli: ["circle", "triangle"]
-    shuffle_choice_order: false
-    rotate_choice_order: false
     show_feedback: false
     conditional_trial_types: [
       {"natural": {"bucket": "morgan-idaea4-natural"}},
@@ -199,10 +163,6 @@ session_config:
     n_calibration_trials: 2
     class_balanced: true
     n_repeats_of_one_stim: 3
-    choice_image_bucket_name: "morgan-fine-grained-media"
-    calibration_stimuli: ["circle", "triangle"]
-    shuffle_choice_order: false
-    rotate_choice_order: false
     show_feedback: false
     conditional_trial_types: [
       {"natural": {"bucket": "morgan-idaea4-natural"}},
@@ -251,6 +211,10 @@ trial_config:
   query_string: "Which category is most similar to the image?"
   feedback_correct_url: "https://miljspsych.s3.amazonaws.com/resources/assets/images/feedback_is_correct_image.png"
   feedback_incorrect_url: "https://miljspsych.s3.amazonaws.com/resources/assets/images/feedback_is_incorrect_image.png"
+  choice_image_bucket_name: "morgan-fine-grained-media"
+  calibration_stimuli: ["circle", "triangle"]
+  shuffle_choice_order: false
+  rotate_choice_order: false
 
 hit_config:
   title: "Challenge: learn to tell apart similar-looking moth species"

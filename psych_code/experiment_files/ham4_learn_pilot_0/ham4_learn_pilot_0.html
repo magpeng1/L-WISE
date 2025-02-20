@@ -2481,11 +2481,11 @@ function get_nway_afc_trials(trial_sequence, session_settings) {
             
             let trialset_id
 
+            // Load API gateway URL from .js stored on s3
+            await load_script(bucket_url + "/aws_constants.js"); // session_metadata_api_url defined inside
+
             // Load a real experiment session if inside turk. Otherwise, just load trialset 0 for testing purposes. 
             if (turkInfo.outsideTurk === false && turkInfo.previewMode === false) {
-                // Load API gateway URL from .js stored on s3
-                await load_script(bucket_url + "/aws_constants.js"); // session_metadata_api_url defined inside
-
                 // Wait for session_metadata_lambda to complete and get the response
                 const response = await session_metadata_lambda(experiment_name, experiment_number, aws_prefix, session_metadata_api_url);
                 trialset_id = response.trialset_id;

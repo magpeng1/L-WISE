@@ -1,7 +1,23 @@
+import sys
 import yaml
 import boto3
 from botocore.exceptions import ClientError
 import time
+
+
+class DualOutput:
+    def __init__(self, filename):
+        self.terminal = sys.stdout
+        self.log = open(filename, 'w')
+
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+        self.log.flush()  # Ensure the file is updated immediately
+
+    def flush(self):
+        self.terminal.flush()
+        self.log.flush()
 
 
 def load_configs(config_path):

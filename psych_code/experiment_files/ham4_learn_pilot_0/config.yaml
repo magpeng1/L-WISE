@@ -6,10 +6,6 @@ session_config:
     n_calibration_trials: 2 
     class_balanced: true
     n_repeats_of_one_stim: 0
-    choice_image_bucket_name: "morgan-fine-grained-media"
-    calibration_stimuli: ["circle", "triangle"]
-    shuffle_choice_order: false
-    rotate_choice_order: false
     conditional_trial_types: [
       {"natural": {"bucket": "morgan-ham10000-natural"}},
       {"enhanced": {"bucket": "morgan-ham10000-20-0dot5-40-logit-diverge"}},
@@ -21,10 +17,6 @@ session_config:
     n_calibration_trials: 2 
     class_balanced: true
     n_repeats_of_one_stim: 1
-    choice_image_bucket_name: "morgan-fine-grained-media"
-    calibration_stimuli: ["circle", "triangle"]
-    shuffle_choice_order: false
-    rotate_choice_order: false
     conditional_trial_types: [
       {"natural": {"bucket": "morgan-ham10000-natural"}},
       {"enhanced": {"bucket": "morgan-ham10000-16-0dot5-32-logit-diverge"}},
@@ -36,10 +28,6 @@ session_config:
     n_calibration_trials: 2 
     class_balanced: true
     n_repeats_of_one_stim: 1
-    choice_image_bucket_name: "morgan-fine-grained-media"
-    calibration_stimuli: ["circle", "triangle"]
-    shuffle_choice_order: false
-    rotate_choice_order: false
     conditional_trial_types: [
       {"natural": {"bucket": "morgan-ham10000-natural"}},
       {"enhanced": {"bucket": "morgan-ham10000-12-0dot5-24-logit-diverge"}},
@@ -51,10 +39,6 @@ session_config:
     n_calibration_trials: 2 
     class_balanced: true
     n_repeats_of_one_stim: 1
-    choice_image_bucket_name: "morgan-fine-grained-media"
-    calibration_stimuli: ["circle", "triangle"]
-    shuffle_choice_order: false
-    rotate_choice_order: false
     conditional_trial_types: [
       {"natural": {"bucket": "morgan-ham10000-natural"}},
       {"enhanced": {"bucket": "morgan-ham10000-8-0dot5-16-logit-diverge"}},
@@ -66,10 +50,6 @@ session_config:
     n_calibration_trials: 2 
     class_balanced: true
     n_repeats_of_one_stim: 1
-    choice_image_bucket_name: "morgan-fine-grained-media"
-    calibration_stimuli: ["circle", "triangle"]
-    shuffle_choice_order: false
-    rotate_choice_order: false
     conditional_trial_types: [
       {"natural": {"bucket": "morgan-ham10000-natural"}},
       {"enhanced": {"bucket": "morgan-ham10000-4-0dot5-8-logit-diverge"}},
@@ -81,10 +61,6 @@ session_config:
     n_calibration_trials: 2 
     class_balanced: true
     n_repeats_of_one_stim: 1
-    choice_image_bucket_name: "morgan-fine-grained-media"
-    calibration_stimuli: ["circle", "triangle"]
-    shuffle_choice_order: false
-    rotate_choice_order: false
     conditional_trial_types: [
       {"natural": {"bucket": "morgan-ham10000-natural"}},
       {"enhanced": {"bucket": "morgan-ham10000-natural"}},
@@ -98,10 +74,6 @@ session_config:
     n_calibration_trials: 2 
     class_balanced: true
     n_repeats_of_one_stim: 3
-    choice_image_bucket_name: "morgan-fine-grained-media"
-    calibration_stimuli: ["circle", "triangle"]
-    shuffle_choice_order: false
-    rotate_choice_order: false
     conditional_trial_types: [
       {"natural": {"bucket": "morgan-ham10000-natural"}},
       {"enhanced": {"bucket": "morgan-ham10000-natural"}},
@@ -117,10 +89,6 @@ session_config:
     n_calibration_trials: 2
     class_balanced: true
     n_repeats_of_one_stim: 3
-    choice_image_bucket_name: "morgan-fine-grained-media"
-    calibration_stimuli: ["circle", "triangle"]
-    shuffle_choice_order: false
-    rotate_choice_order: false
     conditional_trial_types: [
       {"natural": {"bucket": "morgan-ham10000-natural"}},
       {"enhanced": {"bucket": "morgan-ham10000-natural"}},
@@ -152,6 +120,10 @@ trial_config:
   query_string: "Which category is most similar to the image?"
   feedback_correct_url: "https://miljspsych.s3.amazonaws.com/resources/assets/images/feedback_is_correct_image.png"
   feedback_incorrect_url: "https://miljspsych.s3.amazonaws.com/resources/assets/images/feedback_is_incorrect_image.png"
+  choice_image_bucket_name: "morgan-fine-grained-media"
+  calibration_stimuli: ["circle", "triangle"]
+  shuffle_choice_order: false
+  rotate_choice_order: false
 
 hit_config:
   title: "Learn to recognize skin cancer and similar-looking benign skin conditions"

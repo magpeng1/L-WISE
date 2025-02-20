@@ -1,44 +1,12 @@
-session_config:
-  - screening:
-    n_trials_per_class_train: 1
-    n_trials_per_class_val: 1
-    n_trials_per_class_test: 0
-    n_calibration_trials: 0
-    stimulus_duration_msec: 200
-    class_balanced: true
-    bonus_usd_if_correct: 0.00
-  - warmup:
-    show_test_instructions: true
-    n_trials_per_class_train: 1
-    n_trials_per_class_val: 1
-    n_trials_per_class_test: 0
-    n_calibration_trials: 0
-    class_balanced: true
-  - main:
-    n_trials_per_class_train: 9
-    n_trials_per_class_val: 9
-    n_trials_per_class_test: 0
-    n_calibration_trials: 35
-    class_balanced: true
-    warmup_trial_type: "natural"
-    trial_types:
-      natural:
-        bucket: "morgan-imagenet16"
-        incorrect_duration_msec: 1000
-        bonus_usd_if_correct: 0.02
-      enhanced_logit:
-        bucket: "morgan-imagenet16-10-0dot5-20-logit"
-        incorrect_duration_msec: 1000
-        bonus_usd_if_correct: 0.02
-      enhanced_cross_entropy:
-        bucket: "morgan-imagenet16-10-0dot5-20-cross-entropy"
-        incorrect_duration_msec: 1000
-        bonus_usd_if_correct: 0.02
-
 trial_config:
+  keypress_fj_response: false
   reward_duration_msec: 0
   incorrect_duration_msec: 1000
-  stimulus_duration_msec: 17
+  correct_feedback_lockout_duration_msec: 0
+  incorrect_feedback_lockout_duration_msec: 1000
+  show_feedback: true
+  show_fixation: true
+  stimulus_duration_msec: 200
   calibration_stimulus_duration_msec: 200
   post_stimulus_delay_duration_msec: 200
   keep_stimulus_on: false
@@ -58,9 +26,9 @@ trial_config:
   rotate_choice_order: true
 
 hit_config:
-  title: "Identify objects in photos"
-  description: "View 352 photos and identify the animal or other object in each photo"
-  reward: 8.50
+  title: "Identify animals in photos"
+  description: "View 16 photos and identify the animal or other object in each photo"
+  reward: 0.20
   num_respondents: 9
   max_time_seconds: 5400  # 1800 = 30 minutes, 3600 = 1 hour
   lifetime_seconds: 259200  # 259200 = 3 days, 86400 = 1 day

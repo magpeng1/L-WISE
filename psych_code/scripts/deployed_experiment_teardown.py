@@ -89,11 +89,13 @@ def main():
     parser.add_argument('--experiment_name', type=str, required=True, help='Experiment name')
     parser.add_argument('--experiment_number', type=int, required=True, help='Experiment number')
     parser.add_argument('--aws_prefix', default='morgan', type=str, help='Prefix for aws resources (e.g., to avoid confusion with other users)')
+    parser.add_argument('--force', action='store_true', help="No double-check before teardown. Use at your own risk...")
     args = parser.parse_args()
 
-    if not confirm_teardown(args.experiment_name, args.experiment_number):
-        print("Teardown cancelled.")
-        return
+    if not args.force:
+        if not confirm_teardown(args.experiment_name, args.experiment_number):
+            print("Teardown cancelled.")
+            return
 
     exp_id = f"{args.experiment_name}_{args.experiment_number}"
     
