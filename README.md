@@ -40,7 +40,7 @@ unzip L-Wise_ckpts.zip -d imgproc_code/model_ckpts
 rm L-Wise_ckpts.zip
 ```
 
-We provide adversarially-trained/robustified models for all of the datasets we worked with, along with "vanilla" (trained with stochastic gradient descent) versions otherwise trained with the same hyperparameters (learning rate schedule, batch size, etc.). The name of each .pt model file indicates the dataset it was trained or fine-tuned on, as well as the training epsilon for the robust models (ε=1 or ε=3).
+We provide adversarially-trained/robustified models for all of the datasets we worked with, along with "vanilla" (trained with stochastic gradient descent) versions otherwise trained with the same hyperparameters (learning rate schedule, batch size, etc.). The name of each .pt model file indicates the dataset it was trained or fine-tuned on, as well as the training ε for the robust models (ε=1 or ε=3).
 
 For some of the supplementary experiments in the L-WISE paper, we also used pretrained checkpoints from [Debenedetti et al.](https://github.com/dedeswim/vits-robustness-torch) (XCiT-L12 adversarially pretrained on ImageNet with ε=4), [Yun et al.](https://github.com/clovaai/CutMix-PyTorch) (ResNet-50 pretrained on ImageNet with CutMix), and [Gaziv et al.](https://github.com/ggaziv/Wormholes) (ResNet-50 models adversarially pretrained on ImageNet with several different ε values).
 
@@ -72,7 +72,7 @@ python scripts/enhance_vit_aug.py --dest_dir data/imagenet16_xcit_tuned --eps 20
 
 ### Method 2: bash scripts for enhancing datasets and uploading to S3 with multiple perturbation sizes
 
-We provide several bash scripts that automate the process of enhancing entire datasets with multiple different perturbation sizes (pixel budget values "epsilon"), and uploading the resulting copies of the dataset to S3 to be used in psychophysics experiments. They are found in the imgproc_code/scripts/batch_enhance directory. Some modification of the dataset/csv/model checkpoint paths will be requried to get these scripts working on your system. 
+We provide several bash scripts that automate the process of enhancing entire datasets with multiple different perturbation sizes (pixel budget values ε), and uploading the resulting copies of the dataset to S3 to be used in psychophysics experiments. They are found in the imgproc_code/scripts/batch_enhance directory. Some modification of the dataset/csv/model checkpoint paths will be requried to get these scripts working on your system. 
 
 ## How to predict difficulty of images using robust networks
 
@@ -102,7 +102,7 @@ This project builds directly on top of the [Robustness library](https://github.c
 
 You can fine-tune an existing model using adversarial training via the script **imgproc_code/scripts/robust_transfer_learning.py**. Please review the arguments list of this script to understand how to use it. Note that, before training/fine-tuning a model on a new, oustide dataset, you must format the dataset appropriately (see [Dataset organization](#dataset-organization-and-how-to-add-new-datasets-to-this-project) section).
 
-For example, here is how to adversarially-fine-tune an adversarially-ImageNet-pretrained model on the MHIST histology dataset (with an adversarial epsilon of 1 during fine-tuning):
+For example, here is how to adversarially-fine-tune an adversarially-ImageNet-pretrained model on the MHIST histology dataset (with an adversarial ε=1 during fine-tuning):
 ```
 python scripts/robust_transfer_learning.py --dataset_name MHIST --dataset_path path/to/imagefolder/formatted/mhist --n_epochs 50 --lr 0.001 --custom_lr_multiplier "" --batch_size 16 --eps 1 --saved_model_ckpt_path model_ckpts/ImageNet_eps3.pt
 ```
@@ -117,7 +117,7 @@ python scripts/robust_transfer_learning.py --eps 1 --attack_steps 7 --attack_lr 
 
 python scripts/robust_transfer_learning.py --eps 1 --attack_steps 7 --attack_lr 0.3 --n_epochs 100 --lr 0.001 --step_lr 50 --step_lr_gamma 0.1 --gpu_ids 0 --custom_lr_multiplier "" --batch_size 256 --val_batch_size 128 --n_workers 16 --dataset_name inat --dataset_path path/to/inat2021 --continue_same_dataset --saved_model_ckpt_path train_output/85ad31ec-6919-52878a26a9f8/checkpoint.pt.latest
 ```
-In this example, we train with an adversarial epsilon of 1 (7 attack steps with step size 0.3), for 200 epochs, with a starting learning rate of 0.1, and multiplying the learning rate by a factor of 0.1 (--step_lr_gamma) every 50 epochs (--step_lr). 
+In this example, we train with an adversarial ε=1 (7 attack steps with step size 0.3), for 200 epochs, with a starting learning rate of 0.1, and multiplying the learning rate by a factor of 0.1 (--step_lr_gamma) every 50 epochs (--step_lr). 
 
 
 ## Dataset organization, and how to add new datasets to this project
@@ -161,8 +161,8 @@ To train robust models on new, outside datasets, you must define a new class in 
 # Running psychophysics experiments (see "psych_code" directory)
 
 The psych_code directory contains code to replicate our psychophysics experiments.
-The codebase is designed to streamline the process of setting up and running new experiments using cloud-based services.
-In addition to HTML/Javascript code that enables the experiments to run in a web browser, we include scripts for automatically setting up the infrastructure to host these experiments online through the AWS platform, such that participants can then be recruited from Prolific or Mechanical Turk. 
+The codebase is designed to streamline the process of setting up and running new experiments using Amazon Web Services (AWS).
+In addition to HTML/Javascript code that enables the experiments to run in a web browser, we include scripts for automatically setting up the infrastructure to host these experiments online through the AWS platform, such that participants can then be recruited from Prolific or Mechanical Turk. It is also convenient to use the same setup to run the experiment locally for in-person participants. 
 
 ## Quick start: hosting pre-designed experiments from the L-WISE paper on Prolific and AWS
 
@@ -170,55 +170,55 @@ In addition to HTML/Javascript code that enables the experiments to run in a web
 2. Create and configure an experiment on the Prolific website, and obtain the completion code that participants who complete the experiment should receive. 
 3. Run the psych_code/scripts/deploy_experiment.py script from within the psych_code directory. Here is an example command that deploys the moth classification learning experiment from the L-WISE paper to AWS:
 ```
-python scripts/deploy_experiment.py --experiment_name idaea4_learn --experiment_number 10 --num_trialsets 406 --delete_old_apis --num_conditions 7 --randomization_block_size 7 --alternate_within_blocks --completion_code <COMPLETION_CODE_HERE>
+python scripts/deploy_experiment.py --experiment_name idaea4_learn --experiment_number 10 --num_trialsets 280 --delete_old_apis --num_conditions 7 --randomization_block_size 7 --alternate_within_blocks --completion_code <COMPLETION_CODE_HERE>
 ```
-4. After the script finishes, test the experiment interface in your browser using the provided testing link (make sure you copy the provided Prolific URL also). 
-5. Use the psych_code/scripts/get_experiment_data.py script to try downloading data from your testing session (to make sure it works). For example:
+4. After the script finishes, test the experiment interface in your browser using the provided testing link. 
+5. Use the psych_code/scripts/get_experiment_data.py script to try downloading data from your testing session. For example:
 ```
 python scripts/get_experiment_data.py --experiment_name idaea4_learn --experiment_number 10
 ```
-6. Use code similar to that found in notebooks/make_figs.ipynb to convert the data to a Pandas dataframe, make sure it looks as you would expect. 
-7. Copy the Prolific URL (provided by the deploy_experiment.py script) into the Prolific website. If everything went well, you are ready to recruit participants!
+6. Use code similar to that found in notebooks/make_figs.ipynb to convert the data to a Pandas dataframe, and make sure it looks as you would expect. 
+7. Copy the Prolific URL (provided by the deploy_experiment.py script) into the Prolific website. You can find the logged output of the deployment script in the corresponding directory in psych_code/deployed_experiments (look for a "deployment.log" file). If everything went well, you are ready to recruit participants!
 8. Run get_experiment_data.py again to download data once a number of participants have completed the task. It is advisable to do this after a small number of participants have finished to make sure everything is working correctly. 
 
-**IMPORTANT NOTE**: By default, the experiments are set up to log data after each individual trial. This aims to conserve as much data as possible, but can also make the experiment run slowly (especially if there are lots of trials). To speed up the experiment, omit the "&trialsubmit=(url here)" part of the experiment url - it will then only save all the data at the end of the session. 
+**IMPORTANT NOTE**: By default, the experiments are set up to log data after each individual trial. This aims to conserve as much data as possible, but can also make the experiment run slowly (especially if there are lots of trials). To speed up the experiment, consider omitting the "&trialsubmit=(url here)" part of the experiment url - it will then only save all the data at the end of the session (the disadvantage of this is that, if a participant does not make it to the end of the session for any reason, you will lose their data).
 
 ### How to deploy experiments to reproduce L-WISE paper results: 
 
-Deploying a different experiment using the steps above requires only varying the arguments passed to deploy_experiment.py. Below are example commands for deploying each of the experiments from the L-WISE paper. Note that --aws_prefix can be set to anything (e.g., your name) - it is just a way of keeping track of which resources are yours on a shared AWS account.
+Deploying a different experiment using the steps above requires only varying the arguments passed to deploy_experiment.py. Below are example commands for deploying each of the experiments from the L-WISE paper. Note that --aws_prefix can be set to anything (e.g., your name) - it is just a way of keeping track of which resources are yours on a shared AWS account. However, if you change it from the default "lwise", you must also change the aws_prefix value near the top of the html file for the experiment. 
 
-**ImageNet animal recognition task (ResNet50 enhancement with different pixel budgets (epsilon))**
+**ImageNet animal recognition task (Robust-ResNet-50 image enhancement with different ε pixel budgets)**
 ```
-python scripts/deploy_experiment.py --experiment_name imagenet_animals_main --experiment_number 10 --aws_prefix LWISE --num_trialsets 100 --delete_old_apis --num_conditions 1 --completion_code <optional: Prolific completion code here> --screen_out_code <optional: Prolific screenout code here>
+python scripts/deploy_experiment.py --experiment_name imagenet_animals_main --experiment_number 10 --aws_prefix lwise --num_trialsets 100 --delete_old_apis --num_conditions 1 --completion_code <<<optional: Prolific completion code here>>> --screen_out_code <<<optional: Prolific screenout code here>>>
 ```
 
 **Moth species learning task**
 ```
-python scripts/deploy_experiment.py --experiment_name idaea4_learn --experiment_number 10 --aws_prefix LWISE --num_trialsets 280 --delete_old_apis --num_conditions 7 --randomization_block_size 7 --alternate_within_blocks --completion_code <optional: Prolific completion code here>
+python scripts/deploy_experiment.py --experiment_name idaea4_learn --experiment_number 10 --aws_prefix lwise --num_trialsets 280 --delete_old_apis --num_conditions 7 --randomization_block_size 7 --alternate_within_blocks --completion_code <<<optional: Prolific completion code here>>>
 ```
 
 **Dermoscopy learning task**
 ```
-python scripts/deploy_experiment.py --experiment_name ham4_learn --experiment_number 10 --aws_prefix LWISE --num_trialsets 280 --delete_old_apis --num_conditions 7 --randomization_block_size 7 --alternate_within_blocks --completion_code <optional: Prolific completion code here>
+python scripts/deploy_experiment.py --experiment_name ham4_learn --experiment_number 10 --aws_prefix lwise --num_trialsets 280 --delete_old_apis --num_conditions 7 --randomization_block_size 7 --alternate_within_blocks --completion_code <<<optional: Prolific completion code here>>>
 ```
 
 **Histology learning task**
 ```
-python scripts/deploy_experiment.py --experiment_name mhist_learn --experiment_number 10 --aws_prefix LWISE --num_trialsets 120 --delete_old_apis --num_conditions 2 --randomization_block_size 2 --alternate_within_blocks --completion_code <optional: Prolific completion code here>
+python scripts/deploy_experiment.py --experiment_name mhist_learn --experiment_number 10 --aws_prefix lwise --num_trialsets 120 --delete_old_apis --num_conditions 2 --randomization_block_size 2 --alternate_within_blocks --completion_code <<<optional: Prolific completion code here>>>
 ```
 
-**Binary turtle pilot task**
+**Screening task (binary turtle species classification)**
 ```
-python scripts/deploy_experiment.py --experiment_name turtlequal --experiment_number 10 --aws_prefix LWISE --num_trialsets 1 --delete_old_apis --num_conditions 1 --completion_code <optional: Prolific completion code here>
+python scripts/deploy_experiment.py --experiment_name turtlequal --experiment_number 10 --aws_prefix lwise --num_trialsets 1 --delete_old_apis --num_conditions 1 --completion_code <<<optional: Prolific completion code here>>>
 ```
 
 ### How to host experiments on Mechanical Turk
 
 Prolific is the default platform for this codebase - we only used MTurk to run pilot experiments. If you wish to run experiments on MTurk, there are several scripts in psych_code/scripts/mturk that may be useful:
-* create_hit.py creates a new HIT using a URL that you can obtain by running deploy_experiment.py. You must specify the path of config.yaml manually: it will pull various details of the MTurk HIT from this file, which you can edit as desired. PLEASE NOTE: by default, create_hit.py deploys to the mturk SANDBOX, not the production environment. Use the --prod flag when you are ready to switch. 
+* create_hit.py creates a new HIT using a URL that you can obtain by running deploy_experiment.py (or see deployment.log afterwards). You must specify the path of config.yaml manually: it will pull various details of the MTurk HIT from this file, which you can edit as desired. PLEASE NOTE: by default, create_hit.py deploys to the mturk SANDBOX, not the production environment. Use the --prod flag when you are ready to switch. 
 * hit_status.py allows you to monitor an ongoing HIT.
 * get_hit_data.py retrieves all data from a specific HIT, directly from the MTurk platform's storage. Note that this is a separate, redundant data storage mechanism: you can get the same data from S3 using psych_code/scripts/get_experiment_data.py. More usefully, get_hit_data.py also can be called with --approve_all_assignments (to approve and pay each participant), --pay_bonuses (pay bonus to each participant), and/or assign_qualification (which assigns a qual to all participants in the HIT: create a new one by specifying --qualification_name, or use an existing one by specifying --qualification_type_id).
-* compensation_hit.py allows you to create and manage "compensation HITs", which are HITs created specifically to compensate a participant who spent time on the experiment but wasn't able to finish for whatever reason (e.g., if the experiment froze or crashed). 
+* compensation_hit.py allows you to create and manage "compensation HITs", which are special HITs created specifically to compensate a participant who spent time on the experiment but wasn't able to finish for whatever reason (e.g., if the experiment froze or crashed). 
 * mturk_qual.py allows you to manage qualifications: you can create new quals and assign them to mturk workers manually using this script. 
 
 
@@ -253,7 +253,7 @@ The data from each of the behavioral experiments is stored as a .csv file loosel
 
 The experiment_files directory contains one subdirectory for each of several psychophysics experiments. Each directory contains, at minimum: 
 * An HTML file with the same name as the subdirectory, containing all of the HTML and Javascript code to run the experiment (aside from plugins, libraries etc)
-* A dataset_dirmap.csv file, indexing all of the images available within that experiment
+* A dataset_dirmap.csv file, indexing all of the images available within that experiment. Alternatively, you can include custom trial sequences by including trialsets.csv instead (see psych_code/experiment_files/example_custom_experiment_0 for an example of this). 
 * A config.yaml file, specifying various configuration settings for the experiment. 
 
 Each directory corresponding to one experiment must be named "{experiment_name}_{experiment_number}", where experiment_name is a string and experiment_number is an integer. For example, in "dinosaurtask_v2_learn_3", the experiment_name is dinosaurtask_v2_learn and the experiment_number is 3. 
@@ -262,9 +262,35 @@ The names often correspond to the dataset being used, or some derivative part of
 For example, ham4_learn refers to the use of 4 classes from the HAM10000 dataset, and idaea4 refers to using 4 classes from the iNaturalist dataset (all of them being moth species in the genus _idaea_).
 The experiment numbers are arbitrary: we used them to track various pilot experiments, iterative versions of experimental code, etc. 
 
+### **Descriptions of experiment_files directories:**
+
+**imagenet_animals_main_10**: The main ImageNet animal recognition experiment, testing logit-max enhancement at different ε pixel budgets, with off-the-shelf enhancement algorithms as controls
+
+**imagenet_animals_guide_models_10**: Supplementary ImageNet animal recognition experiment (compare enhancements using several different guide models). Before deploying, copy dataset_dirmap.csv from imagenet_animals_main_10. 
+
+**imagenet_animals_loss_ablation_10**: Supplementary ImageNet animal recognition experiment (loss function ablation: test cross-entropy vs logit-max losses for train set and val set images). Before deploying, copy dataset_dirmap.csv from imagenet_animals_main_10. 
+
+**idaea4_learn_10**: iNaturalist moth category learning experiment
+
+**ham4_learn_10**: Main HAM10000 dermoscopy category learning experiment
+
+**ham4_learn_pilot_0**: Pilot HAM10000 dermoscopy image category learning experiment, unsuccessful at boosting learning because initial enhancement level was too strong at ε=20 (results presented in supplementary materials of L-WISE paper). Before deploying, copy dataset_dirmap.csv from ham4_learn_10.
+
+**mhist_learn_10**: MHIST Histology category learning experiment
+
+**turtlequal_10**: Qualifier task in which participants were asked to learn the difference between two different species of turtles (loggerhead and leatherback, images from ImageNet validation set)
+
+**example_custom_experiment_0**: Example of an experiment with a fully customized trial sequence. See ["Implementing experiments with customized trial sequences"](#implementing-experiments-with-customized-trial-sequences) below. The same html file can also be equivalently used with dataset_dirmap.csv as with the above experiments. 
+
 ## HTML files for experimental code
 
-Each experiment has its own HTML file which contains all of code for running the experimental interface in a browser. These were derived from the HTML files in the [Wormholes](https://github.com/ggaziv/Wormholes/tree/main/psych) project and modified extensively. They are designed to be hosted online (e.g., using AWS' S3), and to interact with other AWS services to receive session parameters (e.g., random condition assignments for each participant) and store behavioral data. 
+Each experiment has its own HTML file which contains all of code for running the experimental interface in a browser. These were derived from the HTML files in the [Wormholes](https://github.com/ggaziv/Wormholes/tree/main/psych) project and modified extensively. They are designed to be hosted online (e.g., using AWS' S3), and to interact with other AWS services to receive session parameters (e.g., random condition assignments for each participant) and store behavioral data. If you wish to develop your own experiment, we recommend starting with psych_code/experiment_files/example_custom_experiment_0/example_custom_experiment_0.html (this is the most flexible and up-to-date version - it works with mouse responses or f/j keyboard responses, and with either dataset_dirmap.csv or trialsets.csv).
+
+## Dataset_dirmap.csv and trialsets.csv
+
+All of the directories in psych_code/experiment_files that correspond to experiments from the L-WISE paper contain a file called dataset_dirmap.csv. This file contains a record of all images that can be seen by participants in the corresponding experiment - when the actual "trialsets" (sequences of trials seen by each individual participant) are generated, it is done by randomly sampling rows from this file. 
+
+A more flexible alternative is to specify your own custom trial sequence - in which case you would include a "trialsets.csv" file in your experiment's directory in experiment_files instead of dataset_dirmap.csv. Please see ["Implementing experiments with customized trial sequences"](#implementing-experiments-with-customized-trial-sequences) below for more details on this approach. 
 
 ## Configuring the experiments using config.yaml
 
@@ -272,27 +298,33 @@ The directory for each experiment must contain a config.yaml file, which contain
 
 ### Global and trial-block-specific settings
 
-config.yaml has two main sections: session_config and trial_config. trial_config contains global settings that affect every trial in the experiment. Session_config contains settings that apply only to specific blocks of trials, each of which is a sub-section with an arbitrary name (e.g. train_1, test_3, warmup_block, etc). Most of the settings in trial_config can also appear in the blocks within session_config: generally speaking, **values in trial_config serve as defaults that can be overridden on a block-by-block basis within session_config.** These settings can then be further overridden for specific types of trials - see "Specifying different trial types" section below. 
+config.yaml has two main sections: session_config and trial_config. trial_config contains global settings that affect every trial in the experiment. Session_config contains settings that apply only to specific blocks of trials, each of which is a sub-section in of session_config in config.yaml with an arbitrary name (e.g. train_1, test_3, warmup_block, etc). Most of the settings in trial_config can also appear in the blocks within session_config: generally speaking, **values in trial_config serve as defaults that can be overridden on a block-by-block basis within session_config.** These settings can then be further overridden for specific types of trials - see "Specifying different trial types" section below. 
 
-Each block consists of some number of trials, which may be drawn from one or more "splits" (i.e., train, val, test). Currently, there is only support for class-balanced experiments where each block contains equal numbers of images from each class (if this doesn't work for you, you can edit psych_code/modules/generate_trials.py). You can also specify some number of "calibration trials", which are currently always "circle vs triangle" (note that n_calibration_trials must be a multiple of 2). As an additional control, you can specify n_repeats_of_one_stim. If this is greater than 0, one image will be randomly selected and held out from the experiment: this image will be presented repeatedly within the block. If n_repeats_of_one_stim is greater than 0 in subsequent blocks, it will still be the same stimulus that was presented repeatedly in previous blocks. All trial types are shuffled within their block, regardless of class, split, trial type, and whether they are normal/calibration/repeat trials.
+Each block consists of some number of trials, which may be drawn from one or more "splits" (i.e., train, val, test). Note that this generally refers to the train/test splits of image datasets designed for machine learning, rather than "training" or "testing" human participants. Currently, there is only support for class-balanced experiments where each block contains equal numbers of images from each class (if this doesn't work for you, see ["Implementing experiments with customized trial sequences"](#implementing-experiments-with-customized-trial-sequences) below). You can also specify some number of "calibration trials", which are currently always "circle vs triangle" (note that n_calibration_trials must be a multiple of 2). As an additional control, you can specify n_repeats_of_one_stim. If this is greater than 0, one image will be randomly selected and held out from the experiment: this image will be presented repeatedly within the block. If n_repeats_of_one_stim is greater than 0 in subsequent blocks, it will still be the same stimulus that was presented repeatedly in previous blocks. All trial types are shuffled within their block, regardless of class, split, trial type, and whether they are normal/calibration/repeat trials.
 
-For example, let's say our task has 3 classes dog, wolf, and coyote. The first block in session_config has n_trials_per_class_train=2, n_trials_per_class_val=0, and n_trials_per_class_test=1. n_calibration_trials=2, and n_repeats_of_one_stim=3. The resulting block will have a total of 14 trials: 3 regular trials from each of the 3 splits (9 in total), plus 2 calibration trials, plus 3 repeat stimulus trials (all of which will be randomly shuffled in order). 
+For example, let's say our task has 3 classes: dog, wolf, and coyote. The first block in session_config has n_trials_per_class_train=2, n_trials_per_class_val=0, n_trials_per_class_test=1, n_calibration_trials=2, and n_repeats_of_one_stim=3. The resulting block will have a total of 14 trials: 2 trials with training set images from each of the 3 classes (6 trials), plus 1 trial with a test set image from each class (3 trials), plus 2 calibration trials, plus 3 repeat stimulus trials. All of the 14 trials will be shuffled into a random sequence. 
 
 In addition to session_config and trial_config, there is also a hit_config section at the bottom, which can be used to set various parameters of an experimental "HIT" specifically on Mechanical Turk (not relevant for Prolific/other deployments).
 
+If you specify your trial sequences using trialsets.csv (see ["Implementing experiments with customized trial sequences"](#implementing-experiments-with-customized-trial-sequences) below), you do not need to include the session_config section of config.yaml, only trial_config. 
+
 ### Class/choice names and aliases
 
-This codebase is designed for experiments in which the participant must choose among two or more classes on each trial. There are several settings in config.yaml that determine how these choices are displayed. choice_names_order is an ordered list of class names (the names are as they appear in the "class" column in dataset_dirmap.csc): the buttons the participant must click on to make a response appear in this order in a ring around the center of the screen. If shuffle_choice_order is set to true, their positions are randomly shuffled between each trial. If rotate_choice_order is true, the ring is rotated randomly such that the button positions are "randomized" but their relative ordering stays the same (as specificed in choice_names_order). 
+This codebase is designed for experiments in which the participant must choose among two or more classes on each trial. There are several settings in config.yaml that determine how these choices are displayed. choice_names_order is an ordered list of class names (the names are as they appear in the "class" column in dataset_dirmap.csv, but with underscores replaced with spaces): the buttons the participant must click on to make a response appear in this order arranged in a ring around the center of the screen. If shuffle_choice_order is set to true, their positions are randomly shuffled between each trial. If rotate_choice_order is true, the ring is rotated randomly such that the button positions are "randomized" but their relative ordering stays the same (as specificed in choice_names_order). 
 
 Optionally, each class can be assigned an alias (alternative name for the class). These aliases are defined in the choice_names_aliases dictionary in the trial_config section of config.yaml (see the idaea4 experiment for an example). If choice_aliases_random_shuffle is set to true, the mapping between class names and aliases will be randomly shuffled for each participant (but always consistent within one participant session). 
 
+### Keyboard control for binary classification tasks
+
+For binary classification tasks, it is probably faster for most participants to press the "F" and "J" keys to enter their response to each trial rather than using the mouse. Assuming you build your experiment starting with experiment_files/example_custom_experiment_0/example_custom_experiment_0.html, you can set keypress_fj_response to "true" if you want to use F/J (or false if you want to use the mouse). 
+
 ### Specifying different trial types
 
-Many experiments require multiple distinct "types" of trials - for example, one type of trial may involve presenting enhanced images while another entails presenting non-enhanced images. To specify multiple trial types for a given block in session_config, you can add a sub-section called "trial_types" with a sub-sub-section for each trial type, containing any settings that should override the block-level or global settings for that specific trial type. One important thing to set might be the "bucket" variable: this is how we controlled modifiable parameters of the images being presented (e.g., the pixel budget by which the image was enhanced, the guide model or loss function that was used to enhance it, etc). Essentially, we set up buckets that contain differently-modified copies of the same dataset with exactly the same file names and directory structure - e.g., one bucket for original images, one for images enhanced by ResNet-50 with eps=10, another for eps=20, etc. When "bucket" is set at the trial-type level, after the image is selected from dataset_dirmap.csv (which contains a "url" column with a url to the corresponding image), the S3 bucket name will be replaced within the URL with whatever "bucket" is set to. The config.yaml files for the "imagenet_animals" experiments have good examples of this setup. 
+Many experiments require multiple distinct "types" of trials - for example, one type of trial may involve presenting enhanced images while another entails presenting non-enhanced images. To specify multiple trial types for a given block in session_config, you can add a sub-section called "trial_types" with a sub-sub-section for each trial type, containing any settings that should override the block-level (session_config) or global (trial_config) settings for that specific trial type. One important thing to set might be the "bucket" variable: this is how we controlled modifiable parameters of the images being presented (e.g., the pixel budget by which the image was enhanced, the guide model or loss function that was used to enhance it, etc). Essentially, we set up buckets that contain differently-modified copies of the same dataset with exactly the same file names and directory structure - e.g., one bucket for original images, one for images enhanced by ResNet-50 with ε=10, another for ε=20, etc. When "bucket" is set at the trial-type level, after the image is selected from dataset_dirmap.csv (which contains a "url" column with a url to the corresponding image), the S3 bucket name will be replaced within the URL with whatever "bucket" is set to. The config.yaml files for the "imagenet_animals" experiments have good examples of this setup. 
 
-For other experiments (e.g., the "ham4", "idaea4", and "mhist" learning experiments), settings such as the S3 bucket to use or other variables should depend on which experimental group the participant is in (e.g., control group, enhanced images group, etc). For these experiments, each participant is given a "condition_idx" integer value denoting which group they are in, and this value is used to select trial types from a block-level sub-section called "conditional_trial_types." See the config.yaml files in the idaea4 experiments for an example. Although in this case only one possible trial type for each block is specified for each experimental group, it is possible to add more entries to each dictionary within the conditional_trial_types list, allowing participants to be shown a mixture of different trial types, similar to the case where we specify trial_types in the imagenet animal experiments (but the composition of which now depends on the experimental group they are in). 
+For other experiments (e.g., the "ham4", "idaea4", and "mhist" learning experiments), settings such as the S3 bucket to use or other variables should depend on which experimental group the participant is in (e.g., control group, L-WISE group, etc). For these experiments, each participant is given a "condition_idx" integer value denoting which group they are in, and this value is used to select trial types from a block-level sub-section called "conditional_trial_types." See the config.yaml files of the idaea4 moth experiments for an example. Although in this case only one possible trial type for each block is specified for each experimental group, it is possible to add more entries to each dictionary within the conditional_trial_types dict, allowing participants to be shown a mixture of different trial types - this is similar to the case where we specify trial_types in the imagenet animal experiments (but the composition of which now depends on the experimental group they are in). 
 
-If there are multiple trial types in a block, they will be balanced within each class and each split (considering regular trials only, not calibration or repeat stimulus trials). Therefore, for each train/val/test split, the number of trials per class must be set to a multiple of the number of trial types. If this does not work for you, you can edit psych_code/modules/generate_trials.py. 
+If there are multiple trial types in a block, they will be balanced within each class and each split (considering regular trials only, not calibration or repeat stimulus trials). Therefore, for each train/val/test split, the number of trials per class must be set to a multiple of the number of trial types. If this does not work for you, you can specify a custom trial sequence (see ["Implementing experiments with customized trial sequences"](#implementing-experiments-with-customized-trial-sequences) below). 
 
 ## Deploying experiments to online platforms
 
@@ -314,19 +346,19 @@ Running deploy_experiment.py requires that you first [set up AWS credentials](ht
 Here is an example command to deploy an experiment with experiment_name=idaea4_learn and experiment_id=10:
 
 ```
-python scripts/deploy_experiment.py --experiment_name idaea4_learn --experiment_number 10 --aws_prefix morgan --num_trialsets 406 --delete_old_apis --num_conditions 7 --randomization_block_size 7 --alternate_within_blocks --completion_code <COMPLETION_CODE_HERE>
+python scripts/deploy_experiment.py --experiment_name idaea4_learn --experiment_number 10 --aws_prefix lwise --num_trialsets 406 --delete_old_apis --num_conditions 7 --randomization_block_size 7 --alternate_within_blocks --completion_code <COMPLETION_CODE_HERE>
 ```
 
-As you can see, deploy_experiment.py allows you to specify the number of trialsets to be created, which must be a multiple of --num_conditions (the number of distinct experimental groups participants can be assigned to). By default, there are an equal number of trialsets created for each experimental group, and they are randomly ordered (in terms of the integer trialset_ids). This can lead to imbalances in the number of participants assigned to each group. This problem can be mitigated by setting --randomization_block_size to some multiple of --num_conditions (which must also be a factor of --num_trialsets): the order of experimental groups will be shuffled randomly within "blocks" of this number of trialsets. For example, let's say there are three conditions A, B, and C. We set --num_trialsets to 9. If we are very unlucky, we might generate trialsets such that the sequence of group assignments is AAABBBCCC (the first three participants in the experiment would all be assigned to group A). Remember we want to generate way more trialsets than the number of expected participants - if we only ended up recruiting 6 participants and none of them left or encountered a bug, we wouldn't get any participants in group C. If we use --randomization_block_size 3, we might get a sequence like BCA|ABC|CAB (where | delineates block boundaries). --alternate_within_blocks imposes further structure such that the trialsets alternate within each block: In our example, we would be guaranteed to get the order ABC|ABC|ABC. While useful for ensuring a good balance of participants assigned to each group, this predictable order could introduce selection biases if the order of participant recruitment is not random (e.g., in-person recruitment), but is very unlikely to be a problem for massively parallel online recruitment on MTurk or Prolific because the precise order in which participants join the experiment can be assumed to be random. 
+As you can see, deploy_experiment.py allows you to specify the number of trialsets to be created, which must be a multiple of --num_conditions (the number of distinct experimental groups participants can be assigned to). By default, there are an equal number of trialsets created for each experimental group, and they are randomly ordered (in terms of the integer trialset_ids). This can lead to imbalances in the number of participants assigned to each group. This problem can be mitigated by setting --randomization_block_size to some multiple of --num_conditions (which must also be a factor of --num_trialsets): the order of experimental groups will be shuffled randomly within "blocks" of this number of trialsets. For example, let's say there are three conditions A, B, and C. We set --num_trialsets to 9. If we are very unlucky, we might generate trialsets such that the sequence of group assignments is AAABBBCCC (the first three participants in the experiment would all be assigned to group A). Remember we want to generate way more trialsets than the number of expected participants - if we only ended up recruiting 6 participants and none of them left or encountered a bug, we wouldn't get any participants in group C. If we use --randomization_block_size 3, we might get a sequence like BCA|ABC|CAB (where | delineates randomization block boundaries). --alternate_within_blocks imposes even more structure such that the trialsets alternate within each block: In our example, we would be guaranteed to get the order ABC|ABC|ABC. While useful for ensuring a good balance of participants assigned to each group, this predictable order could introduce selection biases if the order of participant recruitment is not random (e.g., in-person recruitment), but is very unlikely to be a problem for massively parallel online recruitment on MTurk or Prolific because the precise order in which participants join the experiment can be assumed to be random. 
 
-The --aws_prefix appends a prefix to the names of all created AWS resources (Lambda functions, S3 buckets, etc) - this is useful on AWS accounts shared by multiple people to easily keep track of who created what. --delete_old_apis ensures that any old APIs left over from previous deployments with the same experiment_id are cleaned up (otherwise this takes forever manually). The --completion_code is used for experiments to be deployed on Prolific (this is the code participant's receive when they complete the experiment session - it is provided when you set up the experiment on the Prolific website).  
+The --aws_prefix appends a prefix to the names of all created AWS resources (Lambda functions, S3 buckets, etc) - this is useful on AWS accounts shared by multiple people to easily keep track of who created what. You must also change the aws_prefix in your html file to whatever you set this to. --delete_old_apis ensures that any old APIs left over from previous deployments with the same experiment_id are cleaned up (otherwise this takes forever manually). The --completion_code is used for experiments to be deployed on Prolific (this is the code participant's receive when they complete the experiment session - it is provided when you set up the experiment on the Prolific website).  
 
-Note also that you can use the --local_only flag to only set up trialset_ids, aws_constants.js etc locally (i.e., everything will appear in psych_code/deployed_experiments): this is useful for testing the trial generation configuration. If you add --aws_config_only, the script does nothing but update the AWS configuration (Lambda function, DynamoDB, etc) - it does not generate new trialsets, or change any of the contents of the experiment's S3 bucket.
+Note also that you can use the --local_only flag to only set up trialset_ids, aws_constants.js etc locally (i.e., everything will appear in psych_code/deployed_experiments): this is useful for testing the trial generation configuration. If you add --aws_config_only, the script does nothing but update the AWS configuration (Lambda function, DynamoDB, etc) - it does not generate new trialsets, or change any of the contents of the experiment's S3 bucket. Finally, you can specify --files_only: this only generates the trialsets and uploads them to S3 along with the html file, config.yaml, etc (this is much faster if you have already set up all the AWS resources). 
 
 Here is another example of an experiment deployment command: 
 
 ```
-python scripts/deploy_experiment.py --experiment_name imagenet_animals_main --experiment_number 10 --aws_prefix morgan --num_trialsets 100 --delete_old_apis --num_conditions 1 --completion_code <COMPLETION_CODE_HERE> --screen_out_code <SCREENOUT_CODE_HERE>
+python scripts/deploy_experiment.py --experiment_name imagenet_animals_main --experiment_number 10 --aws_prefix lwise --num_trialsets 100 --delete_old_apis --num_conditions 1 --completion_code <COMPLETION_CODE_HERE> --screen_out_code <SCREENOUT_CODE_HERE>
 ```
 
 This deploys an ImageNet Animal experiment in which there is only one experimental group (each participant is shown both original and modified images interspersed with each other). This experiment also has a screening phase: we provide two different codes from the Prolific website, allowing us to later compensate participants differently depending on whether they completed the entire experiment or were screened out. 
@@ -338,43 +370,22 @@ The psych_code/scripts/deployed_experiment_teardown.py script is provided as a w
 To download participant data for an experiment, use psych_code/scripts/get_experiment_data.py. By default, this will fetch data only from completed experiment sessions. If --get_partial_trials is used, for participants where a complete session data record is not available, the script will check for partial data saved from individual trials and attempt to reconstruct an equivalent session record (you can use --require_min_test_trials to require a certain number of test trials to be present in order for this reconstruction to be considered valid). If --get_all_partial_trials is used, the script runs through this reconstruction procedure for every single participant (very time consuming and redundant in most cases, included mostly for debugging purposes). Data will be downloaded in .h5 format: please see notebooks/make_figs.ipynb for an example of how to convert this into a Pandas dataframe. 
 
 
-## Descriptions of experiment_files directories
-
-**imagenet_animals_main_10**: The main ImageNet animal recognition experiment, testing logit-max enhancement at different epsilon pixel budgets, with off-the-shelf enhancement algorithms as controls
-
-**imagenet_animals_guide_models_10**: Supplementary ImageNet animal recognition experiment (compare enhancements using several different guide models). Before deploying, copy dataset_dirmap.csv from imagenet_animals_main_10. 
-
-**imagenet_animals_loss_ablation_10**: Supplementary ImageNet animal recognition experiment (loss function ablation: test cross-entropy vs logit-max losses for train set and val set images). Before deploying, copy dataset_dirmap.csv from imagenet_animals_main_10. 
-
-**idaea4_learn_10**: iNaturalist moth category learning experiment
-
-**ham4_learn_10**: Main HAM10000 dermoscopy category learning experiment
-
-**ham4_learn_pilot_0**: Pilot HAM10000 dermoscopy image category learning experiment, unsuccessful at boosting learning because initial enhancement level was too strong at eps=16 (results presented in supplementary materials of L-WISE paper). Before deploying, copy dataset_dirmap.csv from ham4_learn_10.
-
-**mhist_learn_10**: MHIST Histology category learning experiment
-
-**turtlequal_10**: Qualifier task in which participants were asked to learn the difference between two different species of turtles (loggerhead and leatherback, images from ImageNet validation set)
-
-**example_custom_experiment_0**: Example of an experiment with a fully customized trial sequence. See "Implementing experiments with customized trial sequences" below. 
-
-
 ## Key steps when implementing a new experiment
 
 1. Make a new directory in experiment_files, named {experiment_name}_{experiment_number} (you can make the experiment_name any string and experiment_number any integer). You should almost certainly do this by copying an existing directory. 
 2. Change the name of the html file in the new directory to {experiment_name}_{experiment_number}.html. Also edit the experiment_name and experiment_number variable declarations in the first "body" block to match. 
-3. If you want to use a different dataset or a different set of images for the new experiment, simply replace dataset_dirmap.csv (see main readme for information on how these files should be structured, what columns are required, etc). Note that this may not always be a drop-in replacement: for example, config.yaml might be set up to use class names, split names, AWS bucket names, etc from the original dataset, you might have to create new graphics for the class choice buttons, etc. Code in the scripts/icon_generation folder might be useful for making the new graphics. 
-4. Edit config.yaml as desired. See section on configuration above. 
+3. If you want to use a different dataset or a different set of images for the new experiment, edit or replace dataset_dirmap.csv (see [Dataset organization](#dataset-organization-and-how-to-add-new-datasets-to-this-project) section for information on how this should be structured). Note that this may not always be a drop-in replacement: for example, config.yaml might be set up to use class names, split names, AWS bucket names, etc from the original dataset, you might have to create new graphics for the class choice buttons, etc. Code in the scripts/icon_generation folder might be useful for making the new graphics. A further option is to manually specify the trial sequence for each participant session: see ["Implementing experiments with customized trial sequences"](#implementing-experiments-with-customized-trial-sequences) below. 
+4. Edit config.yaml as desired. See ["Configuring the experiments using config.yaml"](#configuring-the-experiments-using-configyaml) above. 
 
-For more extensive modifications to the behavior of the experiment, we suggest modifying the .html files directly. 
+For more extensive modifications to the interface/behavior of the experimental task, we suggest [using trialsets.csv to specify your own trial sequence](#implementing-experiments-with-customized-trial-sequences) and/or modifying the .html files. 
 
 ## Implementing experiments with customized trial sequences
 
-The instructions above apply to experiments with a specific structure that has several constraints (e.g., balanced classes/trial types, dataset must be specified in a dataset_dirmap.csv with different versions of the same images stored with the same name in different S3 buckets, etc..)
+Most of the instructions above apply to experiments with a specific structure that has several constraints (e.g., balanced classes/trial types, dataset must be specified in a dataset_dirmap.csv with different versions of the same images stored with the same name in different S3 buckets, etc..)
 
-A more flexible way to implement your own experiment is to directly specify the sequence of stimuli to be shown, trial by trial, participant by participant, in a file called "trialsets.csv" inside your subdirectory of experiment_files. For an example of this, please see psych_code/experiment_files/example_custom_experiment_0. Here, trialsets.csv specifies two trialsets (sessions for two different participants, probably): the first session has 16 trials, and the second has 32 (not that you'd necessarily want two participants to see different numbers of trials - this is just to show that you can put whatever trials you want). Each session is specified by a unique integer value in the trialset_id column. You must also specify condition_idx, block, class, and url for each image. condition_idx can be set to 0 if you aren't assigning participants in multiple condition groups, and block can be set to 0 if you don't have distinct blocks of trials within your experiment sessions. You can also optionally specify "trial_type" (e.g. "natural_image", "enhanced_image", "calibration_trial", or any arbitrary string)
+A more flexible way to implement your own experiment is to directly specify the sequence of stimuli to be shown, trial by trial, participant by participant, in a file called "trialsets.csv" inside the subdirectory of experiment_files corresponding to your experiment. For an example of this, please see psych_code/experiment_files/example_custom_experiment_0. Here, trialsets.csv specifies two trialsets (sessions for two different participants, probably): the first session has 16 trials, and the second has 32 (not that you'd necessarily want two participants to see different numbers of trials - this is just to show that you can put whatever trials you want). Each session (or "trialset") is specified by a unique integer value in the trialset_id column. You must also specify condition_idx, block, class, and url for each row (each row in trialsets.csv corresponds to one trial). condition_idx can be set to 0 if you aren't assigning participants in multiple condition groups, and block can be set to 0 if you don't have distinct blocks of trials within your experiment sessions. You can also optionally specify "trial_type" for each row (e.g. "natural_image", "enhanced_image", "calibration_trial", or any arbitrary string).
 
-**VERY IMPORTANT: You can add more columns to trialsets.csv as desired - these can be given the same names as any of the properties in the trial_config block inside the config.yaml file (the values in trialsets.csv will overwrite any defaults in the config.yaml file on a trial-by-trial basis).** You can also specify the 
+**VERY IMPORTANT: You can add more columns to trialsets.csv as desired - these can be given the same names as any of the properties in the trial_config block inside the config.yaml file (the values in trialsets.csv will overwrite any defaults in the config.yaml file on a trial-by-trial basis).** 
 
 Once you have set up your trialsets.csv, you can deploy the experiment as usual. Below are a few commands to deploy example experiments specified in this way.
 
@@ -383,7 +394,7 @@ Binary turtle classification experiment (we show the fixation cross on every sec
 python scripts/deploy_experiment.py --experiment_name example_custom_experiment --experiment_number 0 --aws_prefix lwise --prespecified_trialsets
 ```
 
-Binary turtle classification experiment (where the participant presses F or J keys to make responses instead of using the mouse)
+Binary turtle classification experiment (where the participant presses F or J keys to make responses instead of using the mouse):
 ```
 python scripts/deploy_experiment.py --experiment_name example_custom_experiment --experiment_number 0 --aws_prefix lwise --prespecified_trialsets --config_file_name config_FJ_keypress_response.yaml
 ```

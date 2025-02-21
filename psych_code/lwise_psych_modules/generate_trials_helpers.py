@@ -38,10 +38,16 @@ def rotate_choice_names_and_urls(choice_names_default, class_to_url_dict):
 def get_choice_names_and_urls(block_config, trial_config, class_to_url_dict):
   default_choice_names = [cl.replace("_", " ") for cl in class_to_url_dict.keys()]
 
-  if block_config["shuffle_choice_order"]:
+  if "shuffle_choice_order" in block_config:
+    if block_config["shuffle_choice_order"]:
+      choice_names, choice_urls = shuffle_choice_names_and_urls(default_choice_names, class_to_url_dict)
+  elif "shuffle_choice_order" in trial_config and trial_config["shuffle_choice_order"]:
     choice_names, choice_urls = shuffle_choice_names_and_urls(default_choice_names, class_to_url_dict)
   elif trial_config["choice_names_order"]:
-    if block_config["rotate_choice_order"]:
+    if "rotate_choice_order" in block_config:
+      if block_config["rotate_choice_order"]:
+        choice_names, choice_urls = rotate_choice_names_and_urls(trial_config["choice_names_order"], class_to_url_dict)
+    elif "rotate_choice_order" in trial_config and trial_config["rotate_choice_order"]:
       choice_names, choice_urls = rotate_choice_names_and_urls(trial_config["choice_names_order"], class_to_url_dict)
     else:
       choice_names = trial_config["choice_names_order"]
