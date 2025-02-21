@@ -1,10 +1,6 @@
-# L-WISE: Boosting Human Image Category Learning Through Model-Based Image Selection and Enhancement
+# L-WISE: Boosting Human Visual Category Learning Through Model-Based Image Selection and Enhancement
 
-[Link to project website](https://morganbdt.github.io/L-WISE/) | [Link to paper on arXiv](https://arxiv.org/pdf/2412.09765)
-
-
-## Abstract
-The currently leading artificial neural network (ANN) models of the visual ventral stream -- which are derived from a combination of performance optimization and robustification methods -– have demonstrated a remarkable degree of behavioral alignment with humans on visual categorization tasks. Extending upon previous work, we show that not only can these models guide image perturbations that change the induced human category percepts, but they also can enhance human ability to accurately report the original ground truth. Furthermore, we find that the same models can also be used out-of-the-box to predict the proportion of correct human responses to individual images, providing a simple, human-aligned estimator of the relative difficulty of each image. Motivated by these observations, we propose to augment visual learning in humans in a way that improves human categorization accuracy at test time. Our learning augmentation approach consists of (i) selecting images based on their model-estimated recognition difficulty, and (ii) using image perturbations that aid recognition for novice learners. We find that combining these model-based strategies gives rise to test-time categorization accuracy gains of 33-72% relative to control subjects without these interventions, despite using the same number of training feedback trials. Surprisingly, beyond the accuracy gain, the training time for the augmented learning group was also shorter by 20-23%. We demonstrate the efficacy of our approach in a fine-grained categorization task with natural images, as well as tasks in two clinically relevant image domains -- histology and dermoscopy -- where visual learning is notoriously challenging. To the best of our knowledge, this is the first application of ANNs to increase visual learning performance in humans by enhancing category-specific features.
+[Link to project website](https://morganbdt.github.io/L-WISE/) | [Link to preprint on arXiv](https://arxiv.org/pdf/2412.09765)
 
 ## Codebase Overview and Setup
 
@@ -402,5 +398,25 @@ python scripts/deploy_experiment.py --experiment_name example_custom_experiment 
 16-way ImageNet animal classification experiment:
 ```
 python scripts/deploy_experiment.py --experiment_name example_custom_experiment --experiment_number 0 --aws_prefix lwise --prespecified_trialsets --data_spec_file imagenet_trialsets.csv --config_file_name imagenet_config.yaml
+```
+
+## Acknowledgements
+
+This work was supported in part by Harvard Medical School under the Dean’s Innovation Award for the Use of Artificial Intelligence, in part by Massachusetts Institute of Technology through the David and Beatrice Yamron Fellowship, in part by the National Institute of General Medical Sciences under Award T32GM144273, in part by the National Institutes of Health under Grant R01EY026025, and in part by the National Science Foundation under Grant CCF-1231216. The content is solely the responsibility of the authors and does not necessarily represent the official views of any of the above organizations. The authors would like to thank Andrei Barbu, Roy Ganz, Katherine Harvey, Michael J. Lee, Richard N. Mitchell, and Luke Rosedahl for sharing their helpful insights into our work at various times. This codebase borrows extensively from the [Robustness library](https://github.com/MadryLab/robustness) by the Madry Lab, and uses psychophysics code modified from the [Wormholes](https://github.com/ggaziv/Wormholes) project in the DiCarlo Lab. The source code also includes a copy of the [Multiscale Retinex](https://www.ipol.im/pub/art/2014/107/) source code, with minor compatibility modifications. 
+
+## Citation
+
+If you find this code to be useful, please consider giving it a star ⭐️ and a citation as follows: 
+
+_Talbot, Morgan B., Gabriel Kreiman, James J. DiCarlo, and Guy Gaziv. "L-WISE: Boosting Human Visual Category Learning Through Model-Based Image Selection And Enhancement." International Conference on Learning Representations (2025)._
+
+BibTeX:
+```
+@inproceedings{talbot2025wise,
+  title={L-WISE: Boosting Human Visual Category Learning Through Model-Based Image Selection And Enhancement},
+  author={Talbot, Morgan B and Kreiman, Gabriel and DiCarlo, James J and Gaziv, Guy},
+  booktitle={International Conference on Learning Representations},
+  year={2025}
+}
 ```
 
