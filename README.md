@@ -40,7 +40,7 @@ unzip L-Wise_ckpts.zip -d imgproc_code/model_ckpts
 rm L-Wise_ckpts.zip
 ```
 
-We provide adversarially-trained/robustified models for all of the datasets we worked with, along with "vanilla" (trained with stochastic gradient descent) versions otherwise trained with the same hyperparameters (learning rate schedule, batch size, etc.). The name of each .pt model file indicates the dataset it was trained or fine-tuned on, as well as the training ε for the robust models (ε=1 or ε=3).
+We provide adversarially-trained/robustified models for all of the datasets we worked with, along with "vanilla" (trained with stochastic gradient descent) versions otherwise trained with the same hyperparameters (learning rate schedule, batch size, etc.). The name of each .pt model file indicates the dataset it was trained or fine-tuned on, as well as the training ε for the robust models (e.g., ε=1 or ε=3).
 
 For some of the supplementary experiments in the L-WISE paper, we also used pretrained checkpoints from [Debenedetti et al.](https://github.com/dedeswim/vits-robustness-torch) (XCiT-L12 adversarially pretrained on ImageNet with ε=4), [Yun et al.](https://github.com/clovaai/CutMix-PyTorch) (ResNet-50 pretrained on ImageNet with CutMix), and [Gaziv et al.](https://github.com/ggaziv/Wormholes) (ResNet-50 models adversarially pretrained on ImageNet with several different ε values).
 
@@ -48,7 +48,7 @@ For some of the supplementary experiments in the L-WISE paper, we also used pret
 
 ### Method 1: python script to enhance a dataset
 
-The script imgproc_code/scripts/enhance.py is designed to "enhance" an entire dataset of images indexed using a "dirmap" csv file (see [Dataset organization section](#dataset-organization-and-how-to-add-new-datasets-to-this-project)) using a robust model. A GPU is required for execution. Please see the arguments You must provide, at minimum:
+The script imgproc_code/scripts/enhance.py is designed to "enhance" an entire dataset of images indexed using a "dirmap" csv file (see [Dataset organization section](#dataset-organization-and-how-to-add-new-datasets-to-this-project)) using a robust model. A GPU is required for execution. Please see the arguments in the script for details. You must provide, at minimum:
 * --dest_dir (path to a location where the the enhanced version of the dataset will be saved)
 * --dirmap_path (path to a csv file, with one row for each image to be enhanced - see see [Dataset organization section](#dataset-organization-and-how-to-add-new-datasets-to-this-project) for formatting)
 * --dataset_name (name of the dataset class in imgproc_code/robustness/robustness/datasets.py)
@@ -87,7 +87,7 @@ python scripts/test_model_on_dirmap_get_gt_logit.py --dirmap_path path/to/datase
 # Get logits for "Idaea4" moth photos (4 classes), and also generate a class confusion matrix:
 python scripts/test_model_on_dirmap_get_gt_logit.py --dirmap_path data/idaea4/idaea4_natural/dirmap.csv --dataset_name idaea4 --dataset_path path/to/idaea4_natural --model_ckpt_path model_ckpts/idaea4_eps1.pt --confusion_matrix
 ```
-Note that "--class_num_col orig_class_num" is specified for ImageNet so that we evaluate the ground truth logits on the original 1000 classes, not the superclasses (i.e., how confident is the model that a specific image is "Siberian Husky" rather than "dog" in general)
+Note that "--class_num_col orig_class_num" is specified for ImageNet so that we evaluate the ground truth logits on the original 1000 classes, not the superclasses (i.e., how confident is the model that a specific image is "Siberian Husky" rather than "dog" in general).
 
 In order to use robust_gt_logit for psychophysics experiments in this codebase, it must first be explicitly converted to a difficulty measure (a new column in the dirmap called "difficulty") that should have higher values for more difficult images, unlike robust_gt_logit which is higher for easier images. You can add the difficulty column (using a simple normalization calculation, see script for details) with the command: 
 
@@ -98,7 +98,7 @@ python scripts/calc_difficulty_from_logit.py path/to/your/dataset_dirmap.csv
 
 ## How to train/fine-tune robust models
 
-This project builds directly on top of the [Robustness library](https://github.com/MadryLab/robustness) by the Madry Lab - if you simply wish to experiment with adversarially trained models, you may be better off using that library directly. Our code provides additional functionality for fine-tuning pretrained models through adversarial training.
+This project builds directly on top of the [Robustness library](https://github.com/MadryLab/robustness) by the Madry Lab - if you wish to experiment with adversarially trained models more broadly, you may be better off using that library directly. Our code provides additional functionality for adversarial fine-tuning of pretrained models.
 
 You can fine-tune an existing model using adversarial training via the script **imgproc_code/scripts/robust_transfer_learning.py**. Please review the arguments list of this script to understand how to use it. Note that, before training/fine-tuning a model on a new, oustide dataset, you must format the dataset appropriately (see [Dataset organization](#dataset-organization-and-how-to-add-new-datasets-to-this-project) section).
 
@@ -135,7 +135,7 @@ In this codebase, datasets are generally organized using "dirmap" csv files for 
 * class_num (integer ID associated with the image's class)
 * im_path (path to the image file, relative to the directory the dirmap csv file is placed in. e.g. "val/dog/ILSVRC2012_val_00000269.JPEG")
 
-Optional columns, depending on what the dirmap's origin and what it is being used for, include: 
+Optional columns, depending on the dirmap's origin and what it is being used for, include: 
 * orig_class (string name of the original class before reassignment - e.g., in ImageNet Animals, class=dog when orig_class=Siberian_husky)
 * orig_class_num (integer ID associated with the original class)
 * orig_im_path (relative path to the image file before dataset reorganization)
@@ -150,7 +150,7 @@ In order to train/evaluate models on image datasets within the [Robustness libra
 
 ### Setting up new datasets for model training/evaluation
 
-To train robust models on new, outside datasets, you must define a new class in imgproc_code/robustness/robustness/datasets.py. You can also add hyperparameter defaults in imgproc_code/robustness/robustness/defaults.py, and custom data augmentations in imgproc_code/robustness/robustness/data_augmentation.py. See also the original [Robustness library documentation](https://robustness.readthedocs.io/en/latest/example_usage/training_lib_part_2.html#training-on-custom-datasets) (this project includes a modified copy of the library)
+To train robust models on new, outside datasets, you must define a new class in imgproc_code/robustness/robustness/datasets.py. You can also add hyperparameter defaults in imgproc_code/robustness/robustness/defaults.py, and custom data augmentations in imgproc_code/robustness/robustness/data_augmentation.py. See also the original [Robustness library documentation](https://robustness.readthedocs.io/en/latest/example_usage/training_lib_part_2.html#training-on-custom-datasets) (this project includes a modified copy of that library).
 
 
 
