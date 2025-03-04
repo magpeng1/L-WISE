@@ -39,10 +39,10 @@ for eps in "${custom_eps[@]}"; do
         num_steps=1
     fi
 
-    CUDA_VISIBLE_DEVICES=${GPU_ID}, python enhance.py --eps $eps --num_steps $num_steps --dest_dir data/${DATASET_NAME} --dirmap_path ${DIRMAP_CSV_PATH} --dataset_name ${DATASET_NAME_RB} --dataset_path ${DATASET_PATH} --model_ckpt_path ${MODEL_PATH} --objective_type logit ${save_orig}
+    CUDA_VISIBLE_DEVICES=${GPU_ID}, python scripts/enhance.py --eps $eps --num_steps $num_steps --dest_dir data/${DATASET_NAME} --dirmap_path ${DIRMAP_CSV_PATH} --dataset_name ${DATASET_NAME_RB} --dataset_path ${DATASET_PATH} --model_ckpt_path ${MODEL_PATH} --objective_type logit ${save_orig}
 
     if $DO_ATTACK; then
-        CUDA_VISIBLE_DEVICES=${GPU_ID}, python enhance.py --eps $eps --num_steps $num_steps --dest_dir data/${DATASET_NAME} --dirmap_path ${DIRMAP_CSV_PATH} --dataset_name ${DATASET_NAME_RB} --dataset_path ${DATASET_PATH} --model_ckpt_path ${MODEL_PATH} --objective_type logit --attack
+        CUDA_VISIBLE_DEVICES=${GPU_ID}, python scripts/enhance.py --eps $eps --num_steps $num_steps --dest_dir data/${DATASET_NAME} --dirmap_path ${DIRMAP_CSV_PATH} --dataset_name ${DATASET_NAME_RB} --dataset_path ${DATASET_PATH} --model_ckpt_path ${MODEL_PATH} --objective_type logit --attack
     fi
 
     save_orig=""

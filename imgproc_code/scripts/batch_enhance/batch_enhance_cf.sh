@@ -47,10 +47,10 @@ for class in "${unique_classes[@]}"; do
     for eps in "${custom_eps[@]}"; do
         num_steps=$(printf "%.0f" $(echo "2 * $eps" | bc))   # Calculate the number of steps as 2x epsilon. This makes sure that the number of steps is an integer.
 
-        CUDA_VISIBLE_DEVICES=${GPU_ID}, python enhance.py --eps $eps --num_steps $num_steps --dest_dir data/${DATASET_NAME} --dirmap_path ${DIRMAP_CSV_PATH} --dataset_name ${DATASET_NAME} --dataset_path ${DATASET_PATH} --model_ckpt_path ${MODEL_PATH} --objective_type logit_diverge ${save_orig} --diverge_from ${class}
+        CUDA_VISIBLE_DEVICES=${GPU_ID}, python scripts/enhance.py --eps $eps --num_steps $num_steps --dest_dir data/${DATASET_NAME} --dirmap_path ${DIRMAP_CSV_PATH} --dataset_name ${DATASET_NAME} --dataset_path ${DATASET_PATH} --model_ckpt_path ${MODEL_PATH} --objective_type logit_diverge ${save_orig} --diverge_from ${class}
 
         if $DO_ATTACK; then
-            CUDA_VISIBLE_DEVICES=${GPU_ID}, python enhance.py --eps $eps --num_steps $num_steps --dest_dir data/${DATASET_NAME} --dirmap_path ${DIRMAP_CSV_PATH} --dataset_name ${DATASET_NAME} --dataset_path ${DATASET_PATH} --model_ckpt_path ${MODEL_PATH} --objective_type logit_diverge --attack --diverge_from ${class}
+            CUDA_VISIBLE_DEVICES=${GPU_ID}, python scripts/enhance.py --eps $eps --num_steps $num_steps --dest_dir data/${DATASET_NAME} --dirmap_path ${DIRMAP_CSV_PATH} --dataset_name ${DATASET_NAME} --dataset_path ${DATASET_PATH} --model_ckpt_path ${MODEL_PATH} --objective_type logit_diverge --attack --diverge_from ${class}
         fi
 
         save_orig="" # Stop saving originals after first round
