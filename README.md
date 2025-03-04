@@ -263,7 +263,7 @@ The names often correspond to the dataset being used, or some derivative part of
 For example, ham4_learn refers to the use of 4 classes from the HAM10000 dataset, and idaea4 refers to using 4 classes from the iNaturalist dataset (all of them being moth species in the genus _idaea_).
 The experiment numbers are arbitrary: we used them to track various pilot experiments, iterative versions of experimental code, etc. 
 
-### **Descriptions of experiment_files directories:**
+### Descriptions of experiment_files directories:
 
 **imagenet_animals_main_10**: The main ImageNet animal recognition experiment, testing logit-max enhancement at different ϵ pixel budgets, with off-the-shelf enhancement algorithms as controls
 
