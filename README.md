@@ -23,7 +23,7 @@
     - [Tools for hosting experiments on Mechanical Turk](#tools-for-hosting-experiments-on-mechanical-turk)
   - [Obtaining and analyzing public data from the original L-WISE experiments](#obtaining-and-analyzing-public-data-from-the-original-l-wise-experiments)
   - [Subdirectories in experiment_files (one for each experiment)](#subdirectories-in-experiment_files-one-for-each-experiment)
-    - [**Descriptions of experiment_files directories:**](#descriptions-of-experiment_files-directories)
+    - [Descriptions of experiment_files directories:](#descriptions-of-experiment_files-directories)
   - [HTML files for experimental code](#html-files-for-experimental-code)
   - [Dataset_dirmap.csv and trialsets.csv](#dataset_dirmapcsv-and-trialsetscsv)
   - [Configuring the experiments using config.yaml](#configuring-the-experiments-using-configyaml)
