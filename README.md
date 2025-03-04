@@ -2,8 +2,44 @@
 
 [Link to project website](https://morganbdt.github.io/L-WISE/) | [Link to preprint on arXiv](https://arxiv.org/pdf/2412.09765)
 
-<!-- START doctoc -->
-<!-- END doctoc -->
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+## Table of Contents
+
+  - [Codebase Overview and Setup](#codebase-overview-and-setup)
+- [Enhancing images, predicting image difficulty, and training robust models (see "imgproc_code" directory)](#enhancing-images-predicting-image-difficulty-and-training-robust-models-see-imgproc_code-directory)
+  - [Obtaining pretrained model checkpoints](#obtaining-pretrained-model-checkpoints)
+  - [How to enhance images using robust networks](#how-to-enhance-images-using-robust-networks)
+    - [Method 1: python script to enhance a dataset](#method-1-python-script-to-enhance-a-dataset)
+    - [Method 2: bash scripts for enhancing datasets and uploading to S3 with multiple perturbation sizes](#method-2-bash-scripts-for-enhancing-datasets-and-uploading-to-s3-with-multiple-perturbation-sizes)
+  - [How to predict difficulty of images using robust networks](#how-to-predict-difficulty-of-images-using-robust-networks)
+  - [How to train/fine-tune robust models](#how-to-trainfine-tune-robust-models)
+  - [Dataset organization, and how to add new datasets to this project](#dataset-organization-and-how-to-add-new-datasets-to-this-project)
+    - ["Dirmap" indexing for datasets](#dirmap-indexing-for-datasets)
+    - [Setting up new datasets for model training/evaluation](#setting-up-new-datasets-for-model-trainingevaluation)
+- [Running psychophysics experiments (see "psych_code" directory)](#running-psychophysics-experiments-see-psych_code-directory)
+  - [Quick start: hosting pre-designed experiments from the L-WISE paper on Prolific and AWS](#quick-start-hosting-pre-designed-experiments-from-the-l-wise-paper-on-prolific-and-aws)
+    - [How to deploy experiments to reproduce L-WISE paper results:](#how-to-deploy-experiments-to-reproduce-l-wise-paper-results)
+    - [Tools for hosting experiments on Mechanical Turk](#tools-for-hosting-experiments-on-mechanical-turk)
+  - [Obtaining and analyzing public data from the original L-WISE experiments](#obtaining-and-analyzing-public-data-from-the-original-l-wise-experiments)
+  - [Subdirectories in experiment_files (one for each experiment)](#subdirectories-in-experiment_files-one-for-each-experiment)
+    - [**Descriptions of experiment_files directories:**](#descriptions-of-experiment_files-directories)
+  - [HTML files for experimental code](#html-files-for-experimental-code)
+  - [Dataset_dirmap.csv and trialsets.csv](#dataset_dirmapcsv-and-trialsetscsv)
+  - [Configuring the experiments using config.yaml](#configuring-the-experiments-using-configyaml)
+    - [Global and trial-block-specific settings](#global-and-trial-block-specific-settings)
+    - [Class/choice names and aliases](#classchoice-names-and-aliases)
+    - [Keyboard control for binary classification tasks](#keyboard-control-for-binary-classification-tasks)
+    - [Specifying different trial types](#specifying-different-trial-types)
+  - [Deploying experiments to online platforms](#deploying-experiments-to-online-platforms)
+    - [Initial deployment to AWS](#initial-deployment-to-aws)
+    - [Downloading data from deployed experiments](#downloading-data-from-deployed-experiments)
+  - [Key steps when implementing a new experiment](#key-steps-when-implementing-a-new-experiment)
+  - [Implementing experiments with customized trial sequences](#implementing-experiments-with-customized-trial-sequences)
+  - [Acknowledgements](#acknowledgements)
+  - [Citation](#citation)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Codebase Overview and Setup
 
