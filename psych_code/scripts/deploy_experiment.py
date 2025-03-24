@@ -183,7 +183,7 @@ def main():
       print(f"\nURL TO TEST EXPERIMENT INTERFACE IN BROWSER:\n{os.path.join(bucket_url, exp_file)}?TRIALSET_ID=0&trialsubmit={session_metadata_api_url}&sessionsubmit={session_metadata_api_url}&PLATFORM=test")
       print("    (To test with a different trialset_id (e.g., trialset 42), replace TRIALSET_ID=0 with TRIALSET_ID=42 in the URL above)")
       
-      print(f"\nAll of the above console output is saved in {os.path.join("deployed_experiments", exp_id, "deployment.log")}")
+      print(f"\nAll of the above console output is saved in {os.path.join('deployed_experiments', exp_id, 'deployment.log')}")
   else:
     print("Experiment files successfully generated")
 
