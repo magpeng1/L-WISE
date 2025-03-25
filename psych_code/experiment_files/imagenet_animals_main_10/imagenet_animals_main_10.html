@@ -1064,7 +1064,7 @@ function get_turk_submission_node(trialset_id) {  //(get_submission_data_functio
                             if (emailPattern.test(entry.response.user_email.toString())) {
                                 user_email = entry.response.user_email.toString()
                             } else {
-                                user_email = "invalid email: " + entry.response.user_email.toSTring()
+                                user_email = "invalid email: " + entry.response.user_email.toString()
                             }
                         } 
                     }
