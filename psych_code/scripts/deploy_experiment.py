@@ -51,6 +51,9 @@ def main():
   exp_id = f"{args.experiment_name}_{args.experiment_number}"
   exp_file = f"{exp_id}.html"
 
+  if args.num_trialsets is None and not args.prespecified_trialsets:
+    raise ValueError("Must specify --num_trialsets (integer) if not using --prespecified_trialsets")
+
   if args.data_spec_file_name is not None:
     data_spec_file = args.data_spec_file_name
   elif args.prespecified_trialsets:
