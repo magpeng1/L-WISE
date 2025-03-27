@@ -445,10 +445,11 @@ def main():
   parser.add_argument('--config_path', type=str, default="exp_config.yaml", help='Path to the configuration file')
   parser.add_argument('--dirmap_path', type=str, default="dirmap.csv", help='Path to the directory map CSV')
   parser.add_argument('--output_js_path', type=str, default="bin/trials.js", help='Path for the output JS file')
+  parser.add_argument('--condition_idx', type=int, default=None, help='(Optional) integer ID of the condition index identifier (e.g., control group, intervention group)')
   
   args = parser.parse_args()
 
-  generate_trials(args.config_path, args.dirmap_path, args.output_js_path, args.n_calibration_trials)
+  generate_trials(args.config_path, args.dirmap_path, args.output_js_path, write_csvs=True, condition_idx=args.condition_idx)
 
 
 if __name__ == "__main__":
