@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "lwise_imgproc_utils"
 version = "0.0.1"
 description = "Image processing utilities for L-WISE project"
-requires-python = ">=3.11"
+requires-python = ">=3.9"
 authors = [
     {name = "Morgan Talbot", email = "mtalbot@mit.edu"},
 ]
