@@ -4,15 +4,20 @@ from botocore.exceptions import ClientError
 import zipfile
 import io
 import time
+from pathlib import Path
 
 
 def create_lambda_function(lambda_function_name, role_arn, env_vars=None):
     lambda_client = boto3.client('lambda')
 
+    # **** new
+    module_dir  = Path(__file__).resolve().parent
+    lambda_src  = module_dir / "session_metadata_lambda.py"
+
     # Zip the Lambda function code
     zip_buffer = io.BytesIO()
     with zipfile.ZipFile(zip_buffer, 'a', zipfile.ZIP_DEFLATED, False) as zip_file:
-        zip_file.write('lwise_psych_modules/session_metadata_lambda.py', 'session_metadata_lambda.py')
+        zip_file.write(str(lambda_src), "session_metadata_lambda.py") # changed
     zip_buffer.seek(0)
 
     # Check if the Lambda function already exists

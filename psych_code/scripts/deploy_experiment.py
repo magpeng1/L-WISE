@@ -5,8 +5,30 @@ import shutil
 import numpy as np
 import time
 
-from lwise_psych_modules import *
+##############################################################################
+# Make the repo root (one level above this script) discoverable at run-time. #
+##############################################################################
+import sys
+from pathlib import Path
 
+# /shared/home/map8527/L-WISE-main/psych_code/scripts/deploy_experiment.py
+# └── parents[0]  =  .../psych_code/scripts
+# └── parents[1]  =  .../psych_code          <-- what we need
+root_dir = Path(__file__).resolve().parents[1]
+
+if str(root_dir) not in sys.path:            # avoid duplicates
+    sys.path.append(str(root_dir))
+##############################################################################
+
+# ----------------------------------------------------------------------
+# Repo directories
+# ----------------------------------------------------------------------
+REPO_DIR = Path(__file__).resolve().parents[1]   # …/psych_code
+EXPERIMENT_ROOT = REPO_DIR / "experiment_files"
+DEPLOY_ROOT     = REPO_DIR / "deployed_experiments"
+
+# now regular imports work
+from lwise_psych_modules import *   # <— import what you need
 
 # Function to generate balanced and shuffled blocks
 def generate_balanced_blocks(num_conditions, num_trialsets, block_size, alternate=True):
@@ -61,11 +83,11 @@ def main():
   else:
     data_spec_file = "dataset_dirmap.csv"
 
-  assert os.path.isfile(os.path.join("experiment_files", exp_id, exp_file)), \
+  assert EXPERIMENT_ROOT / exp_id / exp_file, \
     f"Main experiment file missing. Need: experiment_files/{exp_id}/{exp_file}"
-  assert os.path.isfile(os.path.join("experiment_files", exp_id, args.config_file_name)), \
+  assert EXPERIMENT_ROOT / exp_id / exp_file, \
     f"Experiment config .yaml file missing. Need: experiment_files/{exp_id}/{args.config_file_name}"
-  assert os.path.isfile(os.path.join("experiment_files", exp_id, data_spec_file)), \
+  assert EXPERIMENT_ROOT / exp_id / exp_file, \
     f"Data spec file missing. Need: experiment_files/{exp_id}/{data_spec_file}"
 
   # Assert that conditions and block sizes are specified in a way that makes sense
@@ -80,15 +102,18 @@ def main():
     
 
   # Make local directory for deployment of this experiment and copy local files
-  deploy_dir = os.path.join("deployed_experiments", exp_id)
+  deploy_dir = DEPLOY_ROOT / exp_id
   if not os.path.exists(deploy_dir):
     os.makedirs(deploy_dir)
   if not args.aws_config_only:
-    shutil.copy(os.path.join("experiment_files", exp_id, exp_file), deploy_dir)
-    shutil.copy(os.path.join("experiment_files", exp_id, args.config_file_name), deploy_dir)
-    shutil.copy(os.path.join("experiment_files", exp_id, data_spec_file), deploy_dir)
+    # main HTML
+    shutil.copy(EXPERIMENT_ROOT / exp_id / exp_file, deploy_dir)
+    # YAML config
+    shutil.copy(EXPERIMENT_ROOT / exp_id / args.config_file_name, deploy_dir)
+    # data-spec CSV (dataset_dirmap.csv / trialsets.csv / custom)
+    shutil.copy(EXPERIMENT_ROOT / exp_id / data_spec_file, deploy_dir)
 
-  sys.stdout = DualOutput(os.path.join("deployed_experiments", exp_id, "deployment.log"))
+  sys.stdout = DualOutput(str((DEPLOY_ROOT / exp_id / "deployment.log").resolve()))
 
   if not args.local_only:
     # Create S3 bucket for this experiment and upload experiment files
@@ -103,7 +128,7 @@ def main():
       bucket_url = create_s3_bucket(bucket_name, allow_public_files=True)
     if not args.aws_config_only:
       upload_s3_file(bucket_name, os.path.join(deploy_dir, exp_file), acl="public-read")
-      upload_s3_file(bucket_name, os.path.join(deploy_dir, args.config_file_name))
+      upload_s3_file(bucket_name, os.path.join(deploy_dir, args.config_file_name), acl="public-read")
       upload_s3_file(bucket_name, os.path.join(deploy_dir, data_spec_file), acl="public-read")
 
   if not args.aws_config_only:
