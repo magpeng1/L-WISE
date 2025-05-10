@@ -1,6 +1,14 @@
 import argparse
 import boto3
 from botocore.exceptions import ClientError
+
+from pathlib import Path
+import sys
+
+root_dir = Path(__file__).resolve().parents[1]
+if str(root_dir) not in sys.path:
+    sys.path.append(str(root_dir))
+
 from lwise_psych_modules import *
 
 def confirm_teardown(experiment_name, experiment_number):
