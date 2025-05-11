@@ -52,28 +52,58 @@ def write_js_vars(js_file_path, var_dict, var_type="let"):
 
 
 def create_s3_bucket(bucket_name, acl="private", allow_public_files=False):
-  """Create an S3 bucket and return bucket url."""
-  s3_client = boto3.client('s3')
-  try:
-    s3_client.create_bucket(Bucket=bucket_name, ACL=acl, ObjectOwnership='BucketOwnerPreferred')
+    """
+    Create an S3 bucket in the caller's default region and return its URL.
+    Handles the special rules for us-east-1 automatically.
+    """
+    # The region that boto3 is using for this session
+    session = boto3.session.Session()
+    region  = session.region_name or "us-east-1"
 
-    if allow_public_files:
-      # Disable block public access settings for the bucket
-      s3_client.put_public_access_block(
-        Bucket=bucket_name,
-        PublicAccessBlockConfiguration={
-          'BlockPublicAcls': False,
-          'IgnorePublicAcls': False,
-          'BlockPublicPolicy': False,
-          'RestrictPublicBuckets': False
-        }
-      )
+    s3_client = session.client("s3")
 
-    print(f"Bucket {bucket_name} created successfully with ACL \"{acl}.\" and block_public_access={not allow_public_files}")
-  except ClientError as e:
-    print(e)
-    return False
-  return f'https://{bucket_name}.s3.amazonaws.com'
+    try:
+        if region == "us-east-1":
+            # us-east-1 must be created **without** LocationConstraint
+            s3_client.create_bucket(
+                Bucket=bucket_name,
+                ACL=acl,
+                ObjectOwnership="BucketOwnerPreferred",
+            )
+        else:
+            # All other regions require LocationConstraint
+            s3_client.create_bucket(
+                Bucket=bucket_name,
+                ACL=acl,
+                ObjectOwnership="BucketOwnerPreferred",
+                CreateBucketConfiguration={"LocationConstraint": region},
+            )
+
+        # ---------------------------------------------------------
+        # Optional: allow public reads inside the bucket
+        # ---------------------------------------------------------
+        if allow_public_files:
+            s3_client.put_public_access_block(
+                Bucket=bucket_name,
+                PublicAccessBlockConfiguration={
+                    "BlockPublicAcls": False,
+                    "IgnorePublicAcls": False,
+                    "BlockPublicPolicy": False,
+                    "RestrictPublicBuckets": False,
+                },
+            )
+
+        print(
+            f'Bucket "{bucket_name}" created in {region} with ACL "{acl}". '
+            f"block_public_access = {not allow_public_files}"
+        )
+
+    except ClientError as e:
+        print(f"❌  Error creating bucket: {e}")
+        return False
+
+    return f"https://{bucket_name}.s3.{region}.amazonaws.com"
+
 
 
 # Check if a bucket exists
