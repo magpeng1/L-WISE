@@ -15,24 +15,29 @@ trial_config:
   choice_duration_msec: 10000
   pre_choice_lockout_delay_duration_msec: 200
   intertrial_delay_duration_msec: 200
-  bonus_usd_if_correct: 0
-  choice_names_order: ["leatherback turtle", "loggerhead"] # Set to null if no specific order
-  choice_names_aliases: {"leatherback turtle": "A", "loggerhead": "B"}
-  choice_aliases_random_shuffle: true
+
+  # fallback choice_names --> vals in trialsets.csv will override these
+  choice_names_order: ["left","right","tongue","feet"]
+  choice_names_aliases:
+    left: "Left hand"
+    right: "Right hand"
+    tongue: "Tongue"
+    feet: "Feet"
+  choice_aliases_random_shuffle: false
   choice_url_suffix: "_text_icon.png"
-  query_string: "Which category is most similar to the image?"
+  query_string: "Which category matches the image?"
   feedback_correct_url: "https://miljspsych.s3.amazonaws.com/resources/assets/images/feedback_is_correct_image.png"
   feedback_incorrect_url: "https://miljspsych.s3.amazonaws.com/resources/assets/images/feedback_is_incorrect_image.png"
-  choice_image_bucket_name: "morgan-fine-grained-media"
+  choice_image_bucket_name: "maggie-experiment"
   shuffle_choice_order: false
   rotate_choice_order: false
 
 hit_config:
-  title: "Qualify for additional HITs by learning to distinguish animal species"
-  description: "View 24 photos of two different animal species, and learn to tell the difference. Learn by trial and error, and qualify for additional HITs if you make accurate choices."
+  title: "Classify hand and tongue images"
+  description: "Two short blocks: left-vs-right hands and tongue-vs-feet. Learn by trial and error."
   reward: 0.20
-  num_respondents: 9
-  max_time_seconds: 300  # 1800 = 30 minutes, 3600 = 1 hour
-  lifetime_seconds: 259200  # 259200 = 3 days, 86400 = 1 day
-  frame_height: 0  # The height of the task frame (if zero, resizes automatically)
+  num_respondents: 2
+  max_time_seconds: 300 # 1800 = 30 minutes, 3600 = 1 hour
+  lifetime_seconds: 259200 # 259200 = 3 days, 86400 = 1 day
+  frame_height: 0 # The height of the task frame (if zero, resizes automatically)
   autoapprove: true
