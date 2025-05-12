@@ -187,7 +187,7 @@ function get_instructions_node(instructions_html_pages){
 function get_mailing_list_node() {
     return {
         type: jsPsychSurveyText,
-        questions: [{'name': 'user_email', prompt:'<b>CLICK BELOW TO SUBMIT YOUR WORK.</b><br> Optional: enter your email if you wish to be notified of additional studies in the future (if you are on Prolific, it will look like "594a5d31833f6d0001623f8a@email.prolific.co"):'}],
+        questions: [{'name': 'user_email', prompt:'<b>CLICK BELOW TO SUBMIT YOUR WORK.</b><br>'}],
         button_label: 'SUBMIT',
     }
 }
@@ -1813,8 +1813,8 @@ function load_script(url) {
 
     let session_settings = {
     "instructions_html": [
-        "<ul> <li>Thank you for accepting this HIT!</li> <li>This task involves learning to distinguish four different species of moths that look very similar to each other.</li> <li> Your participation will help us find better ways to teach medical students to identify and diagnose diseases more accurately from images. </li> <li>Some trials may be very hard. We cannot guarantee that it is possible to choose accurately in all cases.</li> <li>We reserve the right to end the experiment at any time.</li> <li>If you encounter a bug (e.g., the task freezing), please contact us and let us know. You will be compensated for your time.</li> <li>If you wish, you may view our full consent form document <a href=\"https://morgan-study-misc.s3.amazonaws.com/Consent_Form_19Nov2019.pdf\">here.</a></li> <li>By clicking \"Continue\" on the next page, you voluntarily consent to be a participant in our experiment and agree to all of the rules above.</li> </ul>",
-        "<ul> <b>INSTRUCTIONS</b> <li>Click one of the round buttons to make a choice on each image.</li> <li> Please try your best to learn by trial and error.</li> <li>You must make each choice within <b>10 seconds</b></li> <li>After a training phase with feedback on each choice, there is a test phase with no feedback.</li> <li> <b> You will earn a <text style=\"color:green; font-style:oblique\">$5.00 bonus if your accuracy in the test phase is above 75%, or $10.00 if above 85%, or $20.00 if above 95%.</text> </b> </li> </ul>"
+        "<ul> <li>Thank you for participating in this experiment!</li> <li>This task involves learning to distinguish between two different EEGs of motor imagery tasks (e.g., EEG taken while imagining moving your left vs. right hand).</li> <li> Your participation will help us find better ways to teach medical students to identify and diagnose diseases more accurately from images. </li> <li>Some trials may be hard. We cannot guarantee that it is possible to choose accurately in all cases.</li> <li>We reserve the right to end the experiment at any time.</li> <li>If you encounter a bug (e.g., the task freezing), please contact us and let us know.</li> <li>By clicking \"Continue\" on the next page, you voluntarily consent to be a participant in our experiment.</li> </ul>",
+        "<ul> <b>INSTRUCTIONS</b> <li>Click one of the round buttons to make a choice on each image.</li> <li> Please try your best to learn by trial and error.</li> <li>You must make each choice within <b>20 seconds</b></li> <li>Do your best, and good luck!</li> </ul>"
     ],
     "test_instructions_html": "\n <ul>\n    <li>Thank you for completing the training phase of the experiment!</li>\n       <li>Press \"Continue\" to begin the test phase.</li>\n  <li>During the test, you will <b>not</b> receive feedback, but <text style=\"color:green; font-style:oblique\">You will earn a $5.00 bonus if your accuracy is above 75%, or $10.00 above 85%, or $20.00 above 95%.</text></li>\n      </ul>",
     "calibrate_monitor": false,

@@ -10,7 +10,7 @@ trial_config:
   calibration_stimulus_duration_msec: 0
   post_stimulus_delay_duration_msec: 0
   keep_stimulus_on: true
-  stimulus_width_degrees: 12
+  stimulus_width_degrees: 16
   choice_width_degrees_default: 4
   choice_duration_msec: 20000 # 20 seconds
   pre_choice_lockout_delay_duration_msec: 200
