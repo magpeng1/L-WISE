@@ -9,6 +9,20 @@ import xarray as xr
 from botocore.exceptions import ClientError
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from urllib.parse import unquote, urlparse
+
+# below up to 'from lwise_psych_modules' is new to access parent dir
+import sys
+from pathlib import Path
+
+root_dir = Path(__file__).resolve().parents[1]
+
+if str(root_dir) not in sys.path:
+    sys.path.append(str(root_dir))
+
+REPO_DIR = Path(__file__).resolve().parents[1]
+EXPERIMENT_ROOT = REPO_DIR / "experiment_files"
+DEPLOY_ROOT     = REPO_DIR / "deployed_experiments"
+
 from lwise_psych_modules.process_session_data import process_session_data, get_bonus_amount_from_message
 
 def fetch_experiment_data(dynamodb_client, table_name):
@@ -193,8 +207,8 @@ def process_items(items, experiment_name, experiment_number, aws_prefix, s3_clie
 
 def main(experiment_name, experiment_number, aws_prefix, save_dir, get_partial_trials, get_all_partial_trials, require_min_test_trials, test_blocks, check_if_was_screened_out):
     # Initialize DynamoDB and S3 clients
-    dynamodb_client = boto3.client('dynamodb', region_name='us-east-1')
-    s3_client = boto3.client('s3', region_name='us-east-1')
+    dynamodb_client = boto3.client('dynamodb', region_name='us-east-2')
+    s3_client = boto3.client('s3', region_name='us-east-2')
 
     # Construct the table name
     table_name = f"{aws_prefix}_{experiment_name}_{experiment_number}_trialset_id_mapper"

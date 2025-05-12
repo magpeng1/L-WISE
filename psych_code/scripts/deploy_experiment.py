@@ -5,30 +5,20 @@ import shutil
 import numpy as np
 import time
 
-##############################################################################
-# Make the repo root (one level above this script) discoverable at run-time. #
-##############################################################################
+# below up to 'from lwise_psych_modules' is new to access parent dir
 import sys
 from pathlib import Path
 
-# /shared/home/map8527/L-WISE-main/psych_code/scripts/deploy_experiment.py
-# └── parents[0]  =  .../psych_code/scripts
-# └── parents[1]  =  .../psych_code          <-- what we need
 root_dir = Path(__file__).resolve().parents[1]
 
-if str(root_dir) not in sys.path:            # avoid duplicates
+if str(root_dir) not in sys.path:
     sys.path.append(str(root_dir))
-##############################################################################
 
-# ----------------------------------------------------------------------
-# Repo directories
-# ----------------------------------------------------------------------
-REPO_DIR = Path(__file__).resolve().parents[1]   # …/psych_code
+REPO_DIR = Path(__file__).resolve().parents[1]
 EXPERIMENT_ROOT = REPO_DIR / "experiment_files"
 DEPLOY_ROOT     = REPO_DIR / "deployed_experiments"
 
-# now regular imports work
-from lwise_psych_modules import *   # <— import what you need
+from lwise_psych_modules import *
 
 # Function to generate balanced and shuffled blocks
 def generate_balanced_blocks(num_conditions, num_trialsets, block_size, alternate=True):
